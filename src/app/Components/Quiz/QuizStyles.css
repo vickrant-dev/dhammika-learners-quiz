@@ -1,0 +1,83 @@
+:root {
+  --primary: #4361ee;
+  --primary-light: #4895ef;
+  --primary-dark: #3a0ca3;
+  --success: hsl(142, 69%, 50%);
+  --error: hsl(0, 91%, 64%);
+  --background: #f8fafc;
+  --foreground: #1e293b;
+  --card: #ffffff;
+  --card-foreground: #1e293b;
+  --border: #e2e8f0;
+  --input: #f1f5f9;
+  --ring: rgba(67, 97, 238, 0.3);
+  --radius: 12px;
+}
+
+@plugin "daisyui";
+@plugin "daisyui/theme" {
+  name: "myTheme";
+  default: false;
+  prefersdark: false;
+  color-scheme: "dark";
+  --color-base-100: oklch(12% 0.042 264.695);
+  --color-base-200: oklch(20% 0.042 265.755);
+  --color-base-300: oklch(27% 0.041 260.031);
+  --color-base-content: oklch(96% 0.007 247.896);
+  --color-primary: oklch(71% 0.203 305.504);
+  --color-primary-content: oklch(29% 0.149 302.717);
+  --color-secondary: oklch(74% 0.16 232.661);
+  --color-secondary-content: oklch(29% 0.066 243.157);
+  --color-accent: oklch(70% 0.183 293.541);
+  --color-accent-content: oklch(28% 0.141 291.089);
+  --color-neutral: oklch(27% 0.041 260.031);
+  --color-neutral-content: oklch(98% 0.003 247.858);
+  --color-info: oklch(71% 0.143 215.221);
+  --color-info-content: oklch(98% 0.019 200.873);
+  --color-success: oklch(76% 0.233 130.85);
+  --color-success-content: oklch(98% 0.031 120.757);
+  --color-warning: oklch(76% 0.188 70.08);
+  --color-warning-content: oklch(98% 0.022 95.277);
+  --color-error: oklch(64% 0.246 16.439);
+  --color-error-content: oklch(96% 0.015 12.422);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 1;
+}
+
+.quiz .quiz-container .qa-container .a-container li.disabled {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.quiz .quiz-container .qa-container .a-container li.correct {
+  background-color: var(--color-green-500);
+  border: 1px solid var(--color-green-600);
+  color: white;
+  opacity: 1;
+}
+
+.quiz .quiz-container .qa-container .a-container li.wrong {
+  background-color: var(--color-red-500);
+  border: 1px solid var(--color-red-600);
+  color: white;
+  opacity: 1;
+}
+
+.quiz .quiz-container .back-next .back-btn{
+  opacity: 0;
+  visibility: hidden;
+  transition: all 200ms 0s ease-in-out;
+}
+
+.quiz .quiz-container .back-btn.active{
+  width: 100px;
+  visibility: visible;
+  opacity: 1;
+  transition: all 200ms 0s ease-in-out;
+}
