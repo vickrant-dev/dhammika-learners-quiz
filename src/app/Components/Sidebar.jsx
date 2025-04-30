@@ -8,6 +8,7 @@ import {
 import logo from "../assets/logo.png";
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
+import { supabase } from "../utils/supabase";
 
 export default function Sidebar() {
     const pathname = usePathname();
@@ -64,6 +65,18 @@ export default function Sidebar() {
             return pathname === prefix || pathname.startsWith(`${prefix}/`);
         }
     };
+
+    const logoutDashboard = async () => {
+
+        const { error } = await supabase.auth.signOut();
+        if(error){
+            console.error('Error signing out:', error.message);
+            return;
+        }else{
+            router.push('/login');
+        }
+
+    }
 
     return (
         <div
@@ -128,6 +141,11 @@ export default function Sidebar() {
                     ))}
                 </ul>
             </div>
+
+            <div className="signout">
+                <button onClick={logoutDashboard} className="btn btn-warning">Logout</button>
+            </div>
+
         </div>
     );
 }

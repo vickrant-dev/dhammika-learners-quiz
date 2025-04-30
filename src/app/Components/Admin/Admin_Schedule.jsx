@@ -67,7 +67,11 @@ export default function AdminSchedule() {
             setLessons(data);
             data.map((dt) => {
                 fetchStudentName(dt);
-            })
+            });
+            setLoading((prev) => ({
+                ...prev,
+                fetchlessons: false
+            }));
         }
 
     }
@@ -382,7 +386,7 @@ export default function AdminSchedule() {
                                         <p>Loading</p>
                                     </div>
                                 </>
-                            ) : filteredLessons.length > 0 ? (
+                            ) : filteredLessons && filteredLessons.length > 0 ? (
                                 filteredLessons.map((lesson) => (
                                     <div className="schedule flex items-center justify-between p-5 rounded-xl border border-base-200 shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary/20 bg-gradient-to-br from-base-100 to-base-100/95">
                                         <div className="left flex items-center gap-4">

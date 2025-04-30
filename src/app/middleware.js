@@ -7,19 +7,45 @@ export async function middleware(req) {
 
   const supabase = createMiddlewareClient({ req, res });
   const {
-    data: { user }
+    data: { user },
   } = await supabase.auth.getUser();
 
   const pathname = req.nextUrl.pathname;
 
-  // Restrict access to /admin if not logged in
-  if (pathname.startsWith('/admin') && !user) {
+  // Redirect to login if trying to access /admin or /dashboard and not logged in
+  if ((pathname.startsWith('/admin') || pathname.startsWith('/dashboard')) && !user) {
     return NextResponse.redirect(new URL('/login', req.url));
+  }
+
+  // Restrict access to /admin for non-admins
+  if (pathname.startsWith('/admin')) {
+    const { data: userProfile, error } = await supabase
+      .from('users')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (error || userProfile?.role !== 'admin') {
+      return NextResponse.redirect(new URL('/login', req.url));
+    }
+  }
+
+  // Restrict access to /dashboard for non-students
+  if (pathname.startsWith('/dashboard')) {
+    const { data: userProfile, error } = await supabase
+      .from('students')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (error || userProfile?.role !== 'student') {
+      return NextResponse.redirect(new URL('/login', req.url));
+    }
   }
 
   return res;
 }
 
 export const config = {
-  matcher: ['/admin/:path*'], // Apply to all /admin routes
+  matcher: ['/admin/:path*', '/dashboard/:path*', '/dashboard'],
 };

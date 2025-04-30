@@ -1,6 +1,7 @@
 'use client'
-import { ArrowUp, Calendar, CheckCircle2, CircleAlert, Clock4, MapPin, Plus, UserRound, XIcon } from 'lucide-react';
+import { Calendar, CheckCircle2, CircleAlert, Clock4, Plus, UserRound } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Resend } from 'resend';
 import { supabase } from '../../utils/supabase.js';
 
 export default function Admin() {
@@ -119,7 +120,7 @@ export default function Admin() {
                     return;
                 }
     
-                console.log('successfully inserted data to student_module_assignments db');                
+                console.log('successfully inserted data to lessons db');                
                 setSuccess((prev) => ({
                     ...prev,
                     lessonAdded: true
@@ -130,6 +131,8 @@ export default function Admin() {
                     formNotFilled: false,
                     commonError: false,
                 })
+                fetchScheduledLessons();
+                fetchModules();
             }
 
         } else {
@@ -215,6 +218,9 @@ export default function Admin() {
         fetchModules();
     }, []);
 
+    const sevenDaysFromNow = new Date();
+    sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+
     return (
         <>
             <div id="admin-container">
@@ -252,13 +258,8 @@ export default function Admin() {
                                     </div>
                                     <div className="stat-desc flex items-center gap-1 mt-1 text-success">
                                         <span className="flex items-center text-success font-medium">
-                                            <ArrowUp
-                                                size={18}
-                                                className="mr-1"
-                                            />{" "}
-                                            21%
+                                            {" "}
                                         </span>{" "}
-                                        more than last month
                                     </div>
                                 </div>
                             </div>
@@ -282,7 +283,15 @@ export default function Admin() {
                                             </>
                                         ) : (
                                             <>
-                                                {scheduledLessons ? scheduledLessons.length : '0'}
+                                                {Array.isArray(scheduledLessons)
+                                                ? scheduledLessons
+                                                    .filter(lesson => lesson.status === 'scheduled')
+                                                    .sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date))
+                                                    .filter((scheduledLesson) => new Date(scheduledLesson.scheduled_date) <= sevenDaysFromNow)
+                                                    .slice(0, 7)
+                                                    .length
+                                                : '0'}
+
                                             </>
                                         )}
                                     </div>
@@ -317,11 +326,6 @@ export default function Admin() {
                                 </button>
                                 <dialog id="my_modal_3" className="modal">
                                     <div className="max-h-[90%] modal-box rounded-2xl">
-                                        <form method="dialog">
-                                            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-                                                <XIcon size={17} />
-                                            </button>
-                                        </form>
                                         <h3 className="font-bold text-lg">
                                             Schedule New Lesson
                                         </h3>
@@ -457,53 +461,62 @@ export default function Admin() {
                             </div>
                         </div>
                         <div className="lessons-table flex flex-col gap-6 pt-7">
-                            {scheduledLessons?.slice(0, 7).sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date)).filter((scheduledLesson) => scheduledLesson.status === 'scheduled').map((scheduledLesson) => (
-                                <div className="row flex justify-between border border-base-200 rounded-2xl p-5 bg-base-100 shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary/20">
-                                    <div className="left">
-                                        <div className="user flex gap-4">
-                                            <div className="user-avatar pt-1.25">
-                                                <div className="bg-primary/10 rounded-full p-1 border border-primary/20">
-                                                    <img
-                                                        src=""
-                                                        width={50}
-                                                        height={50}
-                                                        className="rounded-full"
-                                                        alt=""
-                                                    />
+                            {scheduledLessons ? (
+                                scheduledLessons
+                                    ?.sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date))
+                                    .filter((scheduledLesson) => scheduledLesson.status === 'scheduled' && new Date(scheduledLesson.scheduled_date) <= sevenDaysFromNow )
+                                    .slice(0, 7).map((scheduledLesson) => (
+                                    <div className="row flex justify-between border border-base-200 rounded-2xl p-5 bg-base-100 shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary/20">
+                                        <div className="left">
+                                            <div className="user flex gap-4">
+                                                <div className="user-avatar pt-1.25">
+                                                    <div className="bg-primary/10 rounded-full p-1 border border-primary/20">
+                                                        <img
+                                                            src=""
+                                                            width={50}
+                                                            height={50}
+                                                            className="rounded-full"
+                                                            alt=""
+                                                        />
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div className="user-info">
-                                                <h3 className="text-lg font-medium text-primary-focus">
-                                                    { totalStudents ? totalStudents.map((totalStd) => (
-                                                        totalStd.id === scheduledLesson.student_id ? totalStd.full_name : ''
-                                                    )) :(
-                                                        ''
-                                                    ) }
-                                                </h3>
-                                                <p className="text-base-content/80 font-medium">
-                                                    {scheduledLesson.lesson_name}
-                                                </p>
-                                                <p className="flex flex-wrap mt-2.5 gap-3 text-base-content/60">
-                                                    <span className="flex items-center gap-2 bg-base-200/50 px-2 py-1 rounded-lg">
-                                                        <Calendar
-                                                            size={16}
-                                                            className="text-primary"
-                                                        />
-                                                        {scheduledLesson.scheduled_date}
-                                                    </span>
-                                                    <span className="flex items-center gap-2 bg-base-200/50 px-2 py-1 rounded-lg">
-                                                        <Clock4
-                                                            size={16}
-                                                            className="text-secondary"
-                                                        />
-                                                        {scheduledLesson.time.split('+')[0]}
-                                                    </span>
-                                                </p>
+                                                <div className="user-info">
+                                                    <h3 className="text-lg font-medium text-primary-focus">
+                                                        { totalStudents ? totalStudents.map((totalStd) => (
+                                                            totalStd.id === scheduledLesson.student_id ? totalStd.full_name : ''
+                                                        )) :(
+                                                            ''
+                                                        ) }
+                                                    </h3>
+                                                    <p className="text-base-content/80 font-medium">
+                                                        {scheduledLesson.lesson_name}
+                                                    </p>
+                                                    <p className="flex flex-wrap mt-2.5 gap-3 text-base-content/60">
+                                                        <span className="flex items-center gap-2 bg-base-200/50 px-2 py-1 rounded-lg">
+                                                            <Calendar
+                                                                size={16}
+                                                                className="text-primary"
+                                                            />
+                                                            {scheduledLesson.scheduled_date}
+                                                        </span>
+                                                        <span className="flex items-center gap-2 bg-base-200/50 px-2 py-1 rounded-lg">
+                                                            <Clock4
+                                                                size={16}
+                                                                className="text-secondary"
+                                                            />
+                                                            {scheduledLesson.time.split('+')[0]}
+                                                        </span>
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))
+                            ) : (
+                                <>
+                                    <p className='mt-3 text-md font-medium'>No Upcoming Lessons for the next 7 days</p>
+                                </>
+                            ) }
                         </div>
                     </div>
                 </div>
