@@ -1,3 +1,4 @@
+import { CheckCircle, CheckCircle2 } from 'lucide-react';
 import Accordion from './ModuleAccordion';
 
 export default function MyProgress() {
