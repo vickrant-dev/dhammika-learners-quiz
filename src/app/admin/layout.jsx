@@ -1,10 +1,9 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import AdminSidebar from '@/app/Components/Admin/AdminSidebar';
+import ClientAdminLayout from '@/app/Components/Admin/ClientAdminLayout';
 
 export default async function AdminLayout({ children }) {
-
   const supabase = createServerComponentClient({ cookies });
 
   const {
@@ -30,9 +29,8 @@ export default async function AdminLayout({ children }) {
   }
 
   return (
-    <div className="flex">
-      <AdminSidebar />
-      <main className="w-full">{children}</main>
-    </div>
+    <ClientAdminLayout>
+      {children}
+    </ClientAdminLayout>
   );
 }

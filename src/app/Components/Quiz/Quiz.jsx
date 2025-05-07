@@ -7,9 +7,34 @@ import { quiz4Data } from '../../utils/quiz4Data'
 import Timer from './Timer'
 import { useParams, useRouter } from 'next/navigation' // ✅ Updated import
 import Image from 'next/image'
+import { supabase } from "@/app/utils/supabase";
+import './QuizStyles.css';
 
 export default function Quiz() {
+
     const router = useRouter(); // ✅ Replaces useNavigate
+
+    const fetchUser = async () => {    
+            const {
+                data: { user: currentUser },
+                error: userError,
+            } = await supabase.auth.getUser();
+    
+            if (userError || !currentUser) {
+                console.log("Error getting user:", userError?.message);
+                router.push("/student/login");
+                return;
+            }
+    
+            const uid = currentUser?.id;
+            console.log("uid:", uid);
+            console.log("Authenticated user:", currentUser);
+        };
+    
+        useEffect(() => {
+            fetchUser();
+        }, []);
+
     const { quizLink } = useParams(); // ✅ Replaces useParams
 
     const quizDataMap = {
@@ -20,6 +45,12 @@ export default function Quiz() {
     }
 
     const quizData = quizDataMap[Number(quizLink)] || quiz1Data; // ✅ Convert string to number
+    
+    // if quizLink is not valid
+    if (!quizDataMap[Number(quizLink)]) {
+        router.replace('/404');
+        return null;
+    }
 
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [usersAnswers, setUsersAnswers] = useState({});
@@ -74,7 +105,7 @@ export default function Quiz() {
             setIsSubmitted(true);
             localStorage.setItem("quizCompleted", "true");
             localStorage.setItem("quizScore", score);
-            router.replace(`/quizCenter/quiz/${quizLink}/results`); // ✅ Updated navigation
+            router.replace(`/dashboard/quizCenter/quiz/${quizLink}/results`); // ✅ Updated navigation
         } else {
             alert("Please answer the current question before proceeding.")
         }
@@ -92,7 +123,7 @@ export default function Quiz() {
         setIsSubmitted(true);
         localStorage.setItem("quizCompleted", "true");
         localStorage.setItem("quizScore", currentScore);
-        router.replace(`/quizCenter/quiz/${quizLink}/results`); // ✅ Updated navigation
+        router.replace(`/dashboard/quizCenter/quiz/${quizLink}/results`); // ✅ Updated navigation
     }
 
     const handleTimeElapsed = (time) => {

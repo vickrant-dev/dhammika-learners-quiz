@@ -1,13 +1,12 @@
 import { supabase } from "@/app/utils/supabase";
 import { CircleCheck, Clock4, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useDashboardData } from "@/app/components/Dashboard/DashboardData";
 import { useRouter } from "next/navigation";
 
 export default function Dashboard() {
+
     const [assiData, setAssiData] = useState([]);
     const [lessonsData, setLessonsData] = useState([]);
-    const [modulesData, setModulesData] = useState([]);
     const [loading, setLoading] = useState({
         progressLoading: false,
         lessonsLoading: false,
@@ -29,10 +28,6 @@ export default function Dashboard() {
             if (userError || !currentUser) {
                 console.log("Error getting user:", userError?.message);
                 router.push("/student/login");
-                setLoading((prev) => ({
-                    ...prev,
-                    progressLoading: false,
-                }));
                 return;
             }
 
@@ -54,7 +49,7 @@ export default function Dashboard() {
                     progressLoading: false,
                 }));
                 return;
-            } else {
+            } else if(studentID) {
                 console.log("Student ID:", studentID[0].student_id_inherited);
             }
 
@@ -85,54 +80,8 @@ export default function Dashboard() {
                 ...prev,
                 progressLoading: false,
             }));
-
-            // Using Promise.all to fetch modules for all assignments at once
-            const modulePromises = assignments.map((assi) =>
-                fetchModules(assi.module_id)
-            );
-            await Promise.all(modulePromises);
             
             fetchLessons(stdID);
-        };
-
-        const fetchModules = async (assiID) => {
-            setLoading((prev) => ({
-                ...prev,
-                lessonsLoading: true,
-            }));
-
-            console.log("Assi id:", assiID);
-
-            const { data: modules, error: modulesErr } = await supabase
-                .from("modules")
-                .select("*")
-                .eq("id", assiID);
-
-            if (modulesErr) {
-                console.log(
-                    "Error fetching modules data:",
-                    modulesErr?.message
-                );
-                setLoading((prev) => ({
-                    ...prev,
-                    lessonsLoading: false,
-                }));
-                return;
-            }
-
-            console.log("Modules data:", modules);
-
-            // Accumulate modules data instead of overwriting
-            setModulesData((prevModulesData) => [
-                ...prevModulesData,
-                ...modules,
-            ]);
-
-            setLoading((prev) => ({
-                ...prev,
-                lessonsLoading: false,
-            }));
-
         };
 
         const fetchLessons = async (stdID) => {
@@ -158,61 +107,68 @@ export default function Dashboard() {
 
     return (
         <>
-            {/* Add loading while fetching and show UI once done */}
             <div id="dashboard-container">
                 <h1 className="text-2xl mt-10 font-semibold">Dashboard</h1>
                 <div
                     id="dashboard-cards"
                     className="mt-7 flex justify-between gap-5"
-                >
+                >   
                     <div className="stats shadow-md/5 border border-base-300 rounded-xl w-full">
                         <div className="stat">
                             <div className="stat-title text-sm mb-1.5">
                                 Overall Progress
                             </div>
-                            <div className="stat-value flex items-center justify-between">
-                                <p className="font-bold">
-                                    {assiData?.length > 0
-                                        ? (assiData.filter(
-                                              (mod) => mod.completed === "true"
-                                          ).length /
-                                              assiData.length) *
-                                              100 +
-                                          "%"
-                                        : 0}
-                                </p>
-                                <CircleCheck
-                                    className="text-success"
-                                    size={27}
-                                />
-                            </div>
-                            <div className="stat-prog mb-1">
-                                <progress
-                                    className="progress progress-success w-full"
-                                    value={
-                                        assiData?.length > 0
-                                            ? (assiData.filter(
-                                                  (lesson) =>
-                                                      lesson.completed ===
-                                                      "true"
-                                              ).length /
-                                                  assiData.length) *
-                                              100
-                                            : 0
-                                    }
-                                    max="100"
-                                ></progress>
-                            </div>
-                            <div className="stat-desc">
-                                {assiData.length > 0
-                                    ? assiData.filter(
-                                          (lesson) =>
-                                              lesson.completed === "true"
-                                      ).length
-                                    : 0}{" "}
-                                of {assiData.length > 0 ? assiData.length : 0}{" "}
-                                modules completed
-                            </div>
+                            {loading.progressLoading ? (
+                                <>
+                                    <span className="loading loading-spinner loading-md"></span>
+                                </>
+                            ): ( 
+                                <>        
+                                    <div className="stat-value flex items-center justify-between">
+                                        <p className="font-bold">
+                                            {assiData?.length > 0
+                                                ? (assiData.filter(
+                                                    (mod) => mod.completed === "true"
+                                                ).length /
+                                                    assiData.length) *
+                                                    100 +
+                                                "%"
+                                                : 0}
+                                        </p>
+                                        <CircleCheck
+                                            className="text-success"
+                                            size={27}
+                                        />
+                                    </div>
+                                    <div className="stat-prog mb-1">
+                                        <progress
+                                            className="progress progress-success w-full"
+                                            value={
+                                                assiData?.length > 0
+                                                    ? (assiData.filter(
+                                                        (lesson) =>
+                                                            lesson.completed ===
+                                                            "true"
+                                                    ).length /
+                                                        assiData.length) *
+                                                    100
+                                                    : 0
+                                            }
+                                            max="100"
+                                        ></progress>
+                                    </div>
+                                    <div className="stat-desc">
+                                        {assiData.length > 0
+                                            ? assiData.filter(
+                                                (lesson) =>
+                                                    lesson.completed === "true"
+                                            ).length
+                                            : 0}{" "}
+                                        of {assiData.length > 0 ? assiData.length : 0}{" "}
+                                        modules completed
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                     <div className="stats shadow-md/5 border border-base-300 rounded-xl w-full">
@@ -220,31 +176,37 @@ export default function Dashboard() {
                             <div className="stat-title text-sm mb-1.5">
                                 Next Lesson
                             </div>
-                            <div className="stat-value flex items-center justify-between">
-                                <p className="font-bold">
-                                    {lessonsData?.find(
-                                        (lesson) =>
-                                            lesson.status === "scheduled"
-                                    )?.lesson_name || "Yet to be Scheduled"}
-                                </p>
-                                <Clock4 className="text-blue-500" size={27} />
-                            </div>
-
-                            <div className="stat-date">
-                                {lessonsData?.find(
-                                    (lesson) => lesson.status === "scheduled"
-                                )?.scheduled_date || ""}
-                            </div>
-
-                            <div className="stat-time">
-                                {lessonsData
-                                    ?.find(
-                                        (lesson) =>
-                                            lesson.status === "scheduled"
-                                    )
-                                    ?.time?.split("+")[0]
-                                    .slice(0, -3) || ""}
-                            </div>
+                            {loading.lessonsLoading ? (
+                                <>
+                                    <span className="loading loading-spinner loading-md"></span>
+                                </>
+                            ): (
+                                <>
+                                    <div className="stat-value flex items-center justify-between">
+                                        <p className="font-bold">
+                                            {lessonsData?.find(
+                                                (lesson) =>
+                                                    lesson.status === "scheduled"
+                                            )?.lesson_name || "Yet to be Scheduled"}
+                                        </p>
+                                        <Clock4 className="text-blue-500" size={27} />
+                                    </div>
+                                    <div className="stat-date">
+                                        {lessonsData?.find(
+                                            (lesson) => lesson.status === "scheduled"
+                                        )?.scheduled_date || ""}
+                                    </div>
+                                    <div className="stat-time">
+                                        {lessonsData
+                                            ?.find(
+                                                (lesson) =>
+                                                    lesson.status === "scheduled"
+                                            )
+                                            ?.time?.split("+")[0]
+                                            .slice(0, -3) || ""}
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

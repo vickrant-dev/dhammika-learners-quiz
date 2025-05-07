@@ -1,6 +1,8 @@
+'use client'
 import { useState } from "react";
 import { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { supabase } from "@/app/utils/supabase";
+import { useParams, useRouter } from "next/navigation";
 import { quizData } from "../../utils/quizData";
 import { quizPaper } from "../../utils/quizChoice";
 import {
@@ -13,35 +15,58 @@ import {
 } from "lucide-react";
 
 export default function Results() {
-    const navigate = useNavigate();
+
+    const router = useRouter();
+
+    const fetchUser = async () => {
+        const {
+            data: { user: currentUser },
+            error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError || !currentUser) {
+            console.log("Error getting user:", userError?.message);
+            router.push("/student/login");
+            return;
+        }
+
+        const uid = currentUser?.id;
+        console.log("uid:", uid);
+        console.log("Authenticated user:", currentUser);
+    };
+
+    useEffect(() => {
+        fetchUser();
+    }, []);
+
     const { quizLink } = useParams();
     const [quizNumber, setQuizNumber] = useState(quizLink);
 
     const restartQuiz = () => {
-        navigate(`/quizCenter/quiz/${quizLink}`);
+        router.push(`/dashboard/quizCenter/quiz/${quizLink}`);
     };
 
     const handlePrevQuiz = () => {
         const newQuiz = Number.parseInt(quizNumber) - 1;
         setQuizNumber((quizNumber) => quizNumber - 1);
-        navigate(`/quizCenter/quiz/${newQuiz}`);
+        router.push(`/dashboard/quizCenter/quiz/${newQuiz}`);
     };
 
     const handleNextQuiz = () => {
         const newQuiz = Number.parseInt(quizNumber) + 1;
         setQuizNumber((quizNumber) => quizNumber + 1);
-        navigate(`/quizCenter/quiz/${newQuiz}`);
+        router.push(`/dashboard/quizCenter/quiz/${newQuiz}`);
     };
 
     const handleHome = () => {
-        navigate(`/quizCenter`);
+        router.push(`/dashboard/quizCenter`);
     };
 
     useEffect(() => {
         if (localStorage.getItem("quizCompleted") !== "true") {
-            navigate(`/quizCenter/quiz/${quizLink}`);
+            router.push(`/dashboard/quizCenter/quiz/${quizLink}`);
         }
-    }, [navigate]);
+    }, [router, quizLink]);
 
     const results = localStorage.getItem("quizScore");
     const storedResults = Number.parseInt(results);
@@ -67,19 +92,19 @@ export default function Results() {
 
     return (
         <>
-            <div className="flex mt-10">
-                <div className="w-full max-w-xl border border-base-300 rounded-2xl shadow-lg/4 p-8 space-y-8">
+            <div className="flex mt-7">
+                <div className="w-full border border-base-300 rounded-2xl shadow-lg/4 p-8 space-y-8">
                     {/* Header */}
                     <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-2 text-gray-800">
-                            <Award size={26} className="text-primary" />
+                        <div className="flex items-center gap-3 text-gray-800">
+                            <Award size={34} className="text-primary" />
                             <h2 className="text-xl font-semibold">
                                 Quiz Results
                             </h2>
                         </div>
                         <button
                             onClick={restartQuiz}
-                            className="btn btn-soft flex items-center gap-2 text-sm bg-base-300 hover:bg-base-300/50 text-gray-800 cursor-pointer rounded-lg transition-all duration-150 ease-in-out"
+                            className="btn btn-soft flex items-center gap-2 text-sm bg-base-300 hover:bg-base-300/50 text-gray-800 cursor-pointer rounded-lg transition-all duration-150 ease-in-out border-2"
                         >
                             <RotateCcw size={16} />
                             Restart
@@ -92,7 +117,7 @@ export default function Results() {
                     </div>
 
                     {/* Score */}
-                    <div className="flex flex-col items-center space-y-3">
+                    <div className="flex flex-col items-center space-y-4">
                         <div className="text-4xl font-semibold text-neutral">
                             {storedResults}/{quizData.length}
                         </div>
@@ -130,18 +155,18 @@ export default function Results() {
                     <div className={`flex ${quizNumber > 1 ? "justify-between" : "justify-between"} items-center pt-4 border-t border-gray-200`}>
                         {quizNumber > 1 ? (
                             <button
-                                className="btn btn-soft bg-base-300 text-base-content px-3.5 py-2 rounded-md cursor-pointer text-md hover:bg-base-300/50  hover:text-neutral flex items-center gap-2 transition"
+                                className="btn btn-soft bg-base-300 text-base-content px-3.5 py-2 rounded-md cursor-pointer text-md hover:bg-base-300/50  hover:text-neutral flex items-center gap-2 transition border-2"
                                 onClick={handlePrevQuiz}
                             >
                                 <ChevronLeft size={19} className="-translate-y-[1px]" />
-                                Previous
+                                Previous Quiz
                             </button>
                         ) : (
                             ""
                         )}
 
                         <button
-                            className={`btn btn-soft bg-base-300 text-base-content px-3.5 py-2 rounded-lg cursor-pointer text-md hover:bg-base-300/50 flex items-center gap-2 transition-all duration-150 ease-in-out`}
+                            className={`btn btn-soft bg-base-300 text-base-content px-3.5 py-2 rounded-lg cursor-pointer text-md hover:bg-base-300/50 flex items-center gap-2 transition-all duration-150 ease-in-out border-2`}
                             onClick={handleHome}
                         >
                             <Home size={19} className="-translate-y-[1px]" />
@@ -150,10 +175,10 @@ export default function Results() {
 
                         {quizNumber < quizPaper.length && (
                             <button
-                                className="btn btn-soft bg-primary text-primary-content rounded-lg cursor-pointer text-md hover:bg-primary/75 flex items-center gap-2 transition-all duration-150 ease-in-out"
+                                className="btn btn-primary border-2 bg-primary text-primary-content rounded-lg cursor-pointer text-md flex items-center gap-2 transition-all duration-150 ease-in-out"
                                 onClick={handleNextQuiz}
                             >
-                                Next
+                                Next Quiz
                                 <ChevronRight size={19} className="-translate-y-[1px]" />
                             </button>
                         )}

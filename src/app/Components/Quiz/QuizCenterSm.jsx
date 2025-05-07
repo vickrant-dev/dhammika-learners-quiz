@@ -3,10 +3,36 @@
 import { useEffect, useRef, useState } from 'react';
 import { quizPapersm as quizPaper } from '../../utils/sinhala/quizChoicesm';
 import { Timer, NotebookPen, ChevronRight } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
+import { supabase } from "@/app/utils/supabase";
 
 export default function QuizCenterSm() {
+
     const router = useRouter();
+    const pathname = usePathname();
+
+    const fetchUser = async () => {
+
+        const {
+            data: { user: currentUser },
+            error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError || !currentUser) {
+            console.log("Error getting user:", userError?.message);
+            router.push("/student/login");
+            return;
+        }
+
+        const uid = currentUser?.id;
+        console.log("uid:", uid);
+        console.log("Authenticated user:", currentUser);
+    };
+
+    useEffect(() => {
+        fetchUser();
+    }, []);
+
     const [active, setActive] = useState(false);
     const chooserRef = useRef(null);
 
@@ -24,7 +50,7 @@ export default function QuizCenterSm() {
     }, []);
 
     const handleClick = (quizLink) => {
-        router.push(`/dashboard/sm/quizCenter/quiz/${quizLink}`);
+        router.push(`${pathname}/quiz/${quizLink}`);
     };
 
     return (

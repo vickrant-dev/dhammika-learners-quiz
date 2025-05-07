@@ -24,6 +24,7 @@ export default function AdminStudents() {
         phoneNumber: false,
         formIncomplete: false,
         alreadyExists: false,
+        editField: false,
     });
     const [unexpectedErr, setUnexpectedErr] = useState({
         unexpectedError1: false,
@@ -33,6 +34,7 @@ export default function AdminStudents() {
     const [success, setSuccess] = useState({
         addStudent: false,
         deleteStudent: false,
+        editProfile: false,
     });
     const [loading, setLoading] = useState(false);
     const [studentsData, setStudentsData] = useState([]);
@@ -49,6 +51,12 @@ export default function AdminStudents() {
         { module: "" },
     ]);
     const [modulesData, setModulesData] = useState([]);
+
+    const [editForm, setEditForm] = useState({
+        full_name: "",
+        phone_number: "",
+        address: "",
+    }) 
 
     // Add this function to your component
     const debugAuth = async () => {
@@ -400,6 +408,19 @@ export default function AdminStudents() {
         }
 
         try {
+
+            // Deleting it in registered users
+            const { error:regErr } = await supabase
+                .from("registered_users")
+                .delete()
+                .eq("student_id_inherited", stdID);
+            
+            if(regErr) {
+                console.log("Error deleting student in reg:", regErr.message);
+                return;
+            }
+
+            // Deleting it in students table
             const { error } = await supabase
                 .from("students")
                 .delete()
@@ -430,51 +451,91 @@ export default function AdminStudents() {
         }
     };
 
-    // const updateStudentModuleAssi = async (studentID, authUserId) => {
-    //     const studentModAssi = studentsModule
-    //         .filter((mod) => mod.module !== "")
-    //         .map((mod) => ({
-    //             student_id: studentID,
-    //             module_id: mod.module_id,
-    //             completed: 'false',
-    //             auth_user_id: authUserId, // Add the authenticated user's ID here too
-    //             assigned_at: new Date().toISOString(),
-    //         }));
+    const editModal = async (stData) => {
 
-    //     // If no modules selected, skip the insertion
-    //     if (studentModAssi.length === 0) {
-    //         console.log("No modules selected, skipping module assignment");
-    //         return;
-    //     }
+        setEditForm({
+            full_name: stData.full_name,
+            email: stData.email,
+            phone_number: stData.phone_number,
+            address: stData.address,
+            nic: stData.nic   
+        });
 
-    //     try {
-    //         const { data: stdModulesData, error: stdModulesError } =
-    //             await supabase
-    //                 .from("student_module_assignments")
-    //                 .insert(studentModAssi)
-    //                 .select();
+    }
 
-    //         if (stdModulesError) {
-    //             console.log(
-    //                 "Error inserting data to student_module_assi table:",
-    //                 stdModulesError?.message
-    //             );
-    //             console.log("Failed module assignments:", studentModAssi);
-    //             return;
-    //         }
+    const ediProfileChange = async (e) => {
 
-    //         if (stdModulesData) {
-    //             console.log("Student Module Assignments Data:", stdModulesData);
-    //         }
-    //     } catch (error) {
-    //         console.error("Unexpected error updating student modules:", error);
-    //     }
-    // };
+        const { name, value } = e.target;
+        
+        console.log(name);
+        console.log(value);
+
+        setEditForm((prev) => ({
+            ...prev,
+            [name]: value
+        }))        
+
+    }
+
+    const handleSaveEditProfile = async (stdID) => {
+        // Step 1: Validate the editForm
+        const { full_name, phone_number, address, nic } = editForm;
+
+        if (!full_name || !phone_number || !address) {
+            // If any field is empty, show an alert or return early
+            setAlert((prev) => ({
+                ...prev,
+                editField: true,
+            }))
+            return;
+        }
+
+        // Step 2: Proceed with database update if all fields are filled
+        try {
+            
+            const { data:newStdData, error:newStdErr } = await supabase
+                .from('students')
+                .update({
+                    full_name: editForm.full_name,
+                    phone_number: editForm.phone_number,
+                    address: editForm.address,
+                    nic: editForm.nic
+                })
+                .eq("id", stdID)
+
+            if (newStdErr) {
+                console.log("Error updating students table");
+            }
+
+            console.log("Student updated successfully");
+            setAlert((prev) => ({
+                ...prev,
+                editField: false,
+            }));
+            setSuccess((prev) => ({
+                ...prev,
+                editProfile: true
+            }))
+            fetchStudentsData();
+            
+            setTimeout(() => {
+                setSuccess((prev) => ({
+                    ...prev,
+                    editProfile: false,
+                }))
+            }, 5000);
+
+        } catch (error) {
+            console.log("Error updating student:", error);
+            alert("Failed to save changes. Please try again.");
+        }
+    };
+      
 
     return (
         <>
             <div id="admin-container">
-                <div id="admin-body" className="pl-[282px] pt-[2rem] mr-10">
+                <div id="admin-body" className="pl-[2.25rem] pt-[0] mr-10">
                     <div className="title">
                         <h1 className="text-3xl font-semibold mb-7 text-primary-focus">
                             Students
@@ -1041,10 +1102,73 @@ export default function AdminStudents() {
                                                                         <button className="btn btn-default mr-2 rounded-lg border-2 shadow-sm hover:shadow-md transition-all duration-300">
                                                                             Close
                                                                         </button>
-                                                                        <button className="btn btn-primary text-primary-content rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
+                                                                        <button
+                                                                            className="btn btn-primary text-primary-content rounded-lg shadow-sm hover:shadow-md transition-all duration-300"
+                                                                            onClick={
+                                                                                () => {
+                                                                                    const modal =
+                                                                                        document.getElementById(
+                                                                                            `editProfile${stData.id}`
+                                                                                        );
+                                                                                    if (
+                                                                                        modal
+                                                                                    ) {
+                                                                                        modal.showModal();
+                                                                                    }
+                                                                                    editModal(stData);
+                                                                                    }
+                                                                                
+                                                                                // to prevent from calling the getElementById before the dialog is even rendered. Check if the modal is returning a value and then allow it to open the modal based on id.
+                                                                            }
+                                                                        >
                                                                             Edit
                                                                             Profile
                                                                         </button>
+                                                                        <dialog
+                                                                            id={`editProfile${stData.id}`}
+                                                                            className="modal"
+                                                                        >
+                                                                            <div className="modal-box rounded-xl">
+                                                                                <h4 className="text-lg font-semibold mb-5">Edit Contact information</h4>
+                                                                                <div className="student-info flex flex-col space-y-5">
+                                                                                    <label>
+                                                                                        <p className="mb-1 font-medium">Full Name</p>
+                                                                                        <input type="text" name="full_name" className="input rounded-lg" value={editForm.full_name} onChange={ediProfileChange} />
+                                                                                    </label>
+                                                                                    <label>
+                                                                                        <p className="mb-1 font-medium">Phone Number</p>
+                                                                                        <input type="text" name="phone_number" className="input rounded-lg" value={editForm.phone_number} onChange={ediProfileChange} />
+                                                                                    </label>
+                                                                                    <label>
+                                                                                        <p className="mb-1 font-medium">Address</p>
+                                                                                        <input type="text" name="address" className="input rounded-lg" value={editForm.address} onChange={ediProfileChange} />
+                                                                                    </label>
+                                                                                    <label>
+                                                                                        <p className="mb-1 font-medium">NIC</p>
+                                                                                        <input type="text" name="nic" className="input rounded-lg" value={editForm.nic} onChange={ediProfileChange} />
+                                                                                    </label>
+                                                                                </div>
+                                                                                <div className="modal-action">
+                                                                                    <form method="dialog">
+                                                                                        <button className="btn rounded-lg border-2">
+                                                                                            Cancel
+                                                                                        </button>
+                                                                                    </form>
+                                                                                    <div className="save-confirm-btn">
+                                                                                        <button
+                                                                                            className="btn rounded-lg btn-primary transition duration-150 ease-in-out"
+                                                                                            onClick={() =>
+                                                                                                handleSaveEditProfile(
+                                                                                                    stData.id
+                                                                                                )
+                                                                                            }
+                                                                                        >
+                                                                                            Save Changes
+                                                                                        </button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </dialog>
                                                                     </form>
                                                                 </div>
                                                             </div>
@@ -1089,6 +1213,21 @@ export default function AdminStudents() {
                         >
                             <CheckCircle2 size={19} />
                             <span>Student Deleted Successfully</span>
+                        </div>
+                    </div>
+                    <div className="flex items-center justify-end user-success-alert-sec overflow-x-hidden">
+                        <div
+                            role="alert"
+                            className={`alert alert-success flex items-center w-fit rounded-xl 
+                            transition-transform duration-500 ease-in-out
+                            ${
+                                success.editProfile
+                                    ? "translate-x-0 opacity-100"
+                                    : "translate-x-[325px] opacity-0"
+                            }`}
+                        >
+                            <CheckCircle2 size={19} />
+                            <span>Student Updated Successfully</span>
                         </div>
                     </div>
                 </div>

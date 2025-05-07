@@ -1,17 +1,27 @@
+"use client"; // Ensure it runs in the browser
+
 import React, { useEffect, useState } from "react";
 import { quizDatasm as quiz1Datasm } from "../../utils/sinhala/quizDatasm";
 import { quiz2Datasm } from "../../utils/sinhala/quiz2Datasm";
 import { quiz3Datasm } from "../../utils/sinhala/quiz3Datasm";
 import { quiz4Datasm } from "../../utils/sinhala/quiz4Datasm";
 import Timer from "./Timer";
-import { useNavigate, useParams } from "react-router-dom";
-import "../../App.css";
-import './QuizStyles.css';
+import { useRouter, useParams } from "next/navigation";
+import { supabase } from "@/app/utils/supabase";
+import "./QuizStyles.css";
 
-export default function QuizTm() {
-    const navigate = useNavigate();
+export default function QuizSm() {
+    const router = useRouter();
+    const params = useParams();
+    const quizLink = params.quizLink;
 
-    const { quizLink } = useParams();
+    const [user, setUser] = useState(null);
+    const [currentQuestion, setCurrentQuestion] = useState(0);
+    const [usersAnswers, setUsersAnswers] = useState({});
+    const [score, setScore] = useState(0);
+    const [timeTaken, setTimeTaken] = useState(0);
+    const [isSubmitted, setIsSubmitted] = useState(false);
+    const [selectedAnswers, setSelectedAnswers] = useState({});
 
     const quizDataMap = {
         1: quiz1Datasm,
@@ -22,55 +32,43 @@ export default function QuizTm() {
 
     const quizData = quizDataMap[quizLink] || quiz1Datasm;
 
-    const [currentQuestion, setCurrentQuestion] = useState(0);
-    const [usersAnswers, setUsersAnswers] = useState({});
-    const [score, setScore] = useState(0);
+    useEffect(() => {
+        const fetchUser = async () => {
+            const { data: { user: currentUser }, error } = await supabase.auth.getUser();
+            if (error || !currentUser) {
+                console.log("Error:", error?.message);
+                router.push("/student/login");
+            } else {
+                setUser(currentUser);
+                console.log("User authenticated:", currentUser);
+            }
+        };
 
-    const [timeTaken, setTimeTaken] = useState(0);
+        fetchUser();
+    }, []);
 
-    const [isSubmitted, setIsSubmitted] = useState(false);
+    const handleAnswerCheck = (index, answer) => {
+        if (selectedAnswers[currentQuestion] !== undefined) return;
 
-    const handleAnswerCheck = (e, ans, i) => {
-        if (ans.correct) {
-            setUsersAnswers({ ...usersAnswers, [currentQuestion]: i });
-            setScore((prevScore) => prevScore + 1);
-            e.target.classList.add("correct");
-        } else {
-            setUsersAnswers({ ...usersAnswers, [currentQuestion]: i });
+        const isCorrect = answer.correct;
+        const newAnswers = { ...usersAnswers, [currentQuestion]: index };
+        setUsersAnswers(newAnswers);
+        setSelectedAnswers({ ...selectedAnswers, [currentQuestion]: { index, isCorrect } });
 
-            e.target.classList.add("wrong");
-            [...e.target.parentElement.children].forEach((el) => {
-                if (el.dataset.isCorrect === "true") {
-                    el.classList.add("correct");
-                }
-            });
-        }
-
-        [...e.target.parentElement.children].forEach((el) => {
-            el.classList.add("disabled");
-        });
+        if (isCorrect) setScore((prev) => prev + 1);
     };
 
     const handleNext = () => {
-        if (currentQuestion !== quizData.length - 1) {
-            if (usersAnswers[currentQuestion] !== undefined) {
-                document.querySelectorAll(".a-container li").forEach((li) => {
-                    li.classList.remove("correct", "wrong", "disabled");
-                });
-                setCurrentQuestion(currentQuestion + 1);
-            } else {
-                alert("Please answer the current question before proceeding.");
-            }
+        if (usersAnswers[currentQuestion] !== undefined) {
+            setCurrentQuestion((prev) => prev + 1);
+        } else {
+            alert("Please answer the current question before proceeding.");
         }
     };
 
     const handleBack = () => {
         if (currentQuestion > 0) {
-            document.querySelectorAll(".a-container li").forEach((li) => {
-                li.classList.remove("correct", "wrong", "disabled");
-            });
-
-            setCurrentQuestion(currentQuestion - 1);
+            setCurrentQuestion((prev) => prev - 1);
         }
     };
 
@@ -78,10 +76,11 @@ export default function QuizTm() {
         if (usersAnswers[currentQuestion] !== undefined) {
             setIsSubmitted(true);
             localStorage.setItem("quizCompleted", "true");
-            localStorage.setItem("quizScore", score);
-            navigate(`/quizCenter/quiz/${quizLink}/results`, { replace: true });
+            localStorage.setItem("quizScore", score.toString());
+
+            router.push(`/dashboard/sm/quizCenter/quiz/${quizLink}/results`);
         } else {
-            alert("Please answer the current question before proceeding.");
+            alert("Please answer the current question before submitting.");
         }
     };
 
@@ -89,155 +88,113 @@ export default function QuizTm() {
         let currentScore = 0;
 
         quizData.forEach((quizEl, index) => {
-            if (usersAnswers[index] === undefined) {
-                return;
-            } else if (usersAnswers[index] === quizEl.ans) {
-                console.log(usersAnswers);
-                currentScore++;
-            }
+            if (usersAnswers[index] === quizEl.ans) currentScore++;
         });
 
         setScore(currentScore);
-
         setIsSubmitted(true);
-
         localStorage.setItem("quizCompleted", "true");
-        localStorage.setItem("quizScore", currentScore);
-        navigate(`/quizCenter-sm/quiz/sm/${quizLink}/results`, {
-            replace: true,
-        });
+        localStorage.setItem("quizScore", currentScore.toString());
+
+        router.push(`/dashboard/sm/quizCenter/quiz/${quizLink}/results`);
     };
 
     const handleTimeElapsed = (time) => {
         setTimeTaken(time);
-        localStorage.setItem("time-taken", time);
+        localStorage.setItem("time-taken", time.toString());
     };
 
-    useEffect(() => {
-        if (currentQuestion in usersAnswers) {
-            const answerIndex = usersAnswers[currentQuestion];
-            const answerElements = document.querySelectorAll(".a-container li");
-
-            answerElements.forEach((el, elIndex) => {
-                el.classList.add("disabled");
-
-                if (elIndex === answerIndex) {
-                    if (el.dataset.isCorrect === "true") {
-                        el.classList.add("correct");
-                    } else {
-                        el.classList.add("wrong");
-
-                        answerElements.forEach((ansEl) => {
-                            if (ansEl.dataset.isCorrect === "true") {
-                                ansEl.classList.add("correct");
-                            }
-                        });
-                    }
-                }
-            });
-        }
-    }, [currentQuestion, usersAnswers]);
-
     return (
-        <>
-            <div className="quiz flex items-center my-7">
-                <div className="quiz-container w-full bg-primary-content/18 rounded-xl overflow-hidden border border-base-300 shadow-lg/6 backdrop-blur-sm bg-opacity-90">
-                    <div className="heading p-6 border-b border-neutral/10 flex justify-between items-center">
-                        <h2 className="text-2xl font-semibold">Quiz</h2>
-                        <Timer
-                            onTimeUp={handleTimeUp}
-                            isSubmitted={isSubmitted}
-                            onTimeElapsed={handleTimeElapsed}
-                        />
-                    </div>
-                    <div className="qa-container p-6">
-                        <div className="img-container flex">
+        <div className="quiz flex items-center my-7">
+            <div className="quiz-container w-full bg-primary-content/18 rounded-xl overflow-hidden border border-base-300 shadow-lg/6 backdrop-blur-sm bg-opacity-90">
+                <div className="heading p-6 border-b border-neutral/10 flex justify-between items-center">
+                    <h2 className="text-2xl font-semibold">Quiz</h2>
+                    <Timer
+                        onTimeUp={handleTimeUp}
+                        isSubmitted={isSubmitted}
+                        onTimeElapsed={handleTimeElapsed}
+                    />
+                </div>
+
+                <div className="qa-container p-6">
+                    <div className="img-container flex">
+                        {quizData[currentQuestion].src && (
                             <img
-                                src={
-                                    quizData[currentQuestion].src
-                                        ? quizData[currentQuestion].src
-                                        : ""
-                                }
-                                width={quizData[currentQuestion].src ? 130 : 0}
-                                alt={
-                                    quizData[currentQuestion].src
-                                        ? "quizImage"
-                                        : ""
-                                }
-                                style={{
-                                    display: quizData[currentQuestion].src
-                                        ? "flex"
-                                        : "none",
-                                }}
+                                src={quizData[currentQuestion].src}
+                                width={130}
+                                alt="quiz"
                             />
-
-                            <div
-                                className="q-container text-xl font-medium"
-                                style={{
-                                    marginLeft: quizData[currentQuestion].src
-                                        ? "3rem"
-                                        : "0",
-                                }}
-                            >
-                                <p>
-                                    {currentQuestion + 1}.{" "}
-                                    {quizData[currentQuestion].question}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="a-container mt-8 flex flex-col gap-4">
-                            {quizData[currentQuestion].answers.map(
-                                (answer, index) => (
-                                    <li
-                                        className="list-none transition-all duration-150 ease-in-out border border-primary/20 hover:bg-primary-content/70 p-4.25 rounded-lg cursor-pointer"
-                                        key={index}
-                                        onClick={(e) =>
-                                            handleAnswerCheck(e, answer, index)
-                                        }
-                                        data-is-correct={`${answer.correct}`}
-                                    >
-                                        {answer.text}
-                                    </li>
-                                )
-                            )}
+                        )}
+                        <div className="q-container text-xl font-medium ml-6">
+                            <p>
+                                {currentQuestion + 1}.{" "}
+                                {quizData[currentQuestion].question}
+                            </p>
                         </div>
                     </div>
-                    <div className="p-6 border-t border-neutral/10 flex items-center justify-between back-next mt-1 ">
-                        <p className="text-sm text-base-content/90">
-                            <span>
-                                {currentQuestion + 1} of {quizData.length}{" "}
-                                questions
-                            </span>
-                        </p>
 
-                        <div className="flex gap-3">
-                            <button
-                                onClick={handleBack}
-                                className={` rounded-md ${
-                                    currentQuestion > 0
-                                        ? "back-btn active"
-                                        : "back-btn"
-                                } border border-primary/50 btn btn-primary bg-primary-content/50 text-primary w-[100px]`}
-                            >
-                                {currentQuestion > 0 ? "Back" : "Back"}
-                            </button>
+                    <div className="a-container mt-8 flex flex-col gap-4">
+                        {quizData[currentQuestion].answers.map((answer, index) => {
+                            const selected = selectedAnswers[currentQuestion];
+                            const isSelected = selected?.index === index;
+                            const isCorrect = answer.correct;
 
-                            <button
-                                onClick={
-                                    currentQuestion === quizData.length - 1
-                                        ? handleSubmit
-                                        : handleNext
-                                }
-                                className=" rounded-md next-btn btn btn-primary w-[100px]"
-                            >
-                                {currentQuestion === quizData.length - 1
-                                    ? "Submit"
-                                    : "Next"}
-                            </button>
-                        </div>
+                            let className =
+                                "list-none transition-all duration-150 ease-in-out border border-primary/20 hover:bg-primary-content/70 p-4.25 rounded-lg cursor-pointer";
+
+                            if (selected) {
+                                className += " disabled";
+                                if (isSelected && isCorrect) className += " correct";
+                                else if (isSelected) className += " wrong";
+                                else if (isCorrect) className += " correct";
+                            }
+
+                            return (
+                                <li
+                                    key={index}
+                                    className={className}
+                                    onClick={() => handleAnswerCheck(index, answer)}
+                                >
+                                    {answer.text}
+                                </li>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <div className="p-6 border-t border-neutral/10 flex items-center justify-between mt-1">
+                    <p className="text-sm text-base-content/90">
+                        {currentQuestion + 1} of {quizData.length} questions
+                    </p>
+
+                    <div className="flex gap-3">
+                        <button
+                            onClick={handleBack}
+                            className={`rounded-md btn btn-primary w-[100px] ${
+                                currentQuestion > 0
+                                    ? "bg-primary-content/50 text-primary"
+                                    : "opacity-50 cursor-not-allowed"
+                            }`}
+                            disabled={currentQuestion === 0}
+                        >
+                            Back
+                        </button>
+
+                        <button
+                            onClick={
+                                currentQuestion === quizData.length - 1
+                                    ? handleSubmit
+                                    : handleNext
+                            }
+                            className="rounded-md btn btn-primary w-[100px]"
+                        >
+                            {currentQuestion === quizData.length - 1
+                                ? "Submit"
+                                : "Next"}
+                        </button>
                     </div>
                 </div>
             </div>
-        </>
+        </div>
     );
 }

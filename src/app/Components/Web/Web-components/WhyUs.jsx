@@ -1,5 +1,4 @@
 import { ArrowRight, Star } from "lucide-react"
-import "../../../App.css"
 
 export default function WhyUs() {
   return (

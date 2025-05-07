@@ -1,7 +1,30 @@
-import '../../App.css';
+import { supabase } from '@/app/utils/supabase';
 import AccordionTm from './ModuleAccordionTm';
+import { useEffect } from 'react';
 
 export default function MyProgressTm() {
+
+    const fetchUser = async () => {
+
+        const {
+            data: { user: currentUser },
+            error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError || !currentUser) {
+            console.log("Error getting user:", userError?.message);
+            router.push("/student/login");
+            return;
+        }
+
+        const uid = currentUser?.id;
+        console.log("uid:", uid);
+        console.log("Authenticated user:", currentUser);
+    };
+
+    useEffect(() => {
+        fetchUser();
+    }, []);
 
     return (
         <>

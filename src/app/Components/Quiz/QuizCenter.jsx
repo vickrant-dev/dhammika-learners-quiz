@@ -4,9 +4,33 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { quizPaper } from '../../utils/quizChoice';
 import { Timer, NotebookPen, ChevronRight } from 'lucide-react';
+import { supabase } from "@/app/utils/supabase";
 
 export default function QuizCenter() {
+
     const router = useRouter();
+
+    const fetchUser = async () => {
+        const {
+            data: { user: currentUser },
+            error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError || !currentUser) {
+            console.log("Error getting user:", userError?.message);
+            router.push("/student/login");
+            return;
+        }
+
+        const uid = currentUser?.id;
+        console.log("uid:", uid);
+        console.log("Authenticated user:", currentUser);
+    };
+
+    useEffect(() => {
+        fetchUser();
+    }, []);
+
     const pathname = usePathname(); // optional: in case you need current path for language handling
 
     const [active, setActive] = useState(false);

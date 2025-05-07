@@ -73,7 +73,7 @@ export default function Sidebar() {
             console.error('Error signing out:', error.message);
             return;
         }else{
-            router.push('/login');
+            router.push('/student/login');
         }
 
     }

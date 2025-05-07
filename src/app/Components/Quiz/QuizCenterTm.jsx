@@ -4,9 +4,34 @@ import { useEffect, useRef, useState } from 'react';
 import { quizPapertm as quizPaper } from '../../utils/tamil/quizChoicetm';
 import { Timer, NotebookPen, ChevronRight } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
+import { supabase } from "@/app/utils/supabase";
 
 export default function QuizCenterTm() {
+
     const router = useRouter();
+
+    const fetchUser = async () => {
+
+        const {
+            data: { user: currentUser },
+            error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError || !currentUser) {
+            console.log("Error getting user:", userError?.message);
+            router.push("/student/login");
+            return;
+        }
+
+        const uid = currentUser?.id;
+        console.log("uid:", uid);
+        console.log("Authenticated user:", currentUser);
+    };
+
+    useEffect(() => {
+        fetchUser();
+    }, []);
+
     const pathname = usePathname(); // used to maintain dynamic language path
 
     const [active, setActive] = useState(false);
@@ -26,7 +51,6 @@ export default function QuizCenterTm() {
     }, []);
 
     const handleClick = (quizLink) => {
-        // Handles dynamic path, e.g., /dashboard/tm/quizCenter/quiz/[slug]
         router.push(`${pathname}/quiz/${quizLink}`);
     };
 

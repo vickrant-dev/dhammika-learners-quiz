@@ -1,5 +1,4 @@
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import "../../../App.css"
 
 export default function Testimonials() {
   return (

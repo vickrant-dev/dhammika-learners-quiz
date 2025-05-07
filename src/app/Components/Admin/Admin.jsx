@@ -224,7 +224,7 @@ export default function Admin() {
     return (
         <>
             <div id="admin-container">
-                <div id="admin-body" className="pl-[282px] pt-[2rem] mr-10">
+                <div id="admin-body" className="pl-[2.25rem] pt-[0] mr-10">
                     <div className="title">
                         <h1 className="text-3xl font-semibold mb-7 text-primary-focus">
                             Dashboard

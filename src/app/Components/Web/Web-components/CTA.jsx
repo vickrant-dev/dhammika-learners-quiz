@@ -1,5 +1,4 @@
 import { ChevronRight } from "lucide-react"
-import "../../../App.css"
 
 export default function CTA() {
   return (
