@@ -31,8 +31,8 @@ export default function MyProgress() {
 
     return (
         <>
-            <div id="my-progress-container">
-                <h1 className='text-2xl mt-10 font-semibold'>My Progress</h1>
+            <div id="my-progress-container" className='pl-[1.75rem] lg:pl-[2.25rem] md:pl-[2.25rem] sm:pl-[2.25rem] pr-4 lg:pr-8 sm:pr-6'>
+                <h1 className='text-2xl font-semibold'>My Progress</h1>
                 <p className='mt-1.75 text-sm text-neutral-500'>Track your learning journey through each module</p>
                 <div className="module-container">
                     <div className="module">

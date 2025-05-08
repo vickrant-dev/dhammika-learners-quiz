@@ -92,13 +92,13 @@ export default function Results() {
 
     return (
         <>
-            <div className="flex mt-7">
-                <div className="w-full border border-base-300 rounded-2xl shadow-lg/4 p-8 space-y-8">
+            <div className="flex -mt-[0.28rem] pl-[1.25rem] lg:pl-[2.25rem] md:pl-[2.25rem] sm:pl-[2.25rem] pr-4 lg:pr-8 md:pr-8 sm:pr-4 ">
+                <div className="w-full border border-base-300 rounded-2xl shadow-lg/4 p-6 sm:p-8 space-y-6 sm:space-y-8 bg-base-100">
                     {/* Header */}
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div className="flex items-center gap-3 text-gray-800">
-                            <Award size={34} className="text-primary" />
-                            <h2 className="text-xl font-semibold">
+                            <Award size={30} className="text-primary" />
+                            <h2 className="text-lg sm:text-xl font-semibold">
                                 Quiz Results
                             </h2>
                         </div>
@@ -112,13 +112,13 @@ export default function Results() {
                     </div>
 
                     {/* Performance Message */}
-                    <div className="flex items-center justify-center font-medium text-lg text-primary">
+                    <div className="flex items-center justify-center font-medium text-base sm:text-lg text-primary text-center">
                         {performanceMessage}
                     </div>
 
-                    {/* Score */}
+                    {/* Score Section */}
                     <div className="flex flex-col items-center space-y-4">
-                        <div className="text-4xl font-semibold text-neutral">
+                        <div className="text-3xl sm:text-4xl font-semibold text-neutral">
                             {storedResults}/{quizData.length}
                         </div>
                         <div className="w-full">
@@ -134,39 +134,40 @@ export default function Results() {
                         </div>
                     </div>
 
-                    {/* Time Display */}
-                    <div className="flex items-center gap-4 text-gray-700">
-                        <Clock size={28} className="text-primary" />
+                    {/* Time Taken */}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-gray-700">
+                        <Clock size={24} className="text-primary" />
                         <div>
                             <div className="text-sm font-medium">
                                 Time Taken
                             </div>
                             <div className="text-sm">
                                 {minutes > 0 &&
-                                    `${minutes} ${
-                                        minutes === 1 ? "minute" : "minutes"
-                                    } `}
+                                    `${minutes} ${minutes === 1 ? "minute" : "minutes"} `}
                                 {seconds} seconds
                             </div>
                         </div>
                     </div>
 
                     {/* Navigation */}
-                    <div className={`flex ${quizNumber > 1 ? "justify-between" : "justify-between"} items-center pt-4 border-t border-gray-200`}>
+                    <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center pt-4 border-t border-gray-200 gap-4 sm:gap-0">
                         {quizNumber > 1 ? (
                             <button
-                                className="btn btn-soft bg-base-300 text-base-content px-3.5 py-2 rounded-md cursor-pointer text-md hover:bg-base-300/50  hover:text-neutral flex items-center gap-2 transition border-2"
+                                className="btn btn-soft bg-base-300 text-base-content px-3.5 py-2 rounded-md cursor-pointer text-md hover:bg-base-300/50 hover:text-neutral flex items-center gap-2 transition border-2"
                                 onClick={handlePrevQuiz}
                             >
-                                <ChevronLeft size={19} className="-translate-y-[1px]" />
+                                <ChevronLeft
+                                    size={19}
+                                    className="-translate-y-[1px]"
+                                />
                                 Previous Quiz
                             </button>
                         ) : (
-                            ""
+                            <div className={`${quizNumber > 1 ? "flex" :"hidden"}`}></div>
                         )}
 
                         <button
-                            className={`btn btn-soft bg-base-300 text-base-content px-3.5 py-2 rounded-lg cursor-pointer text-md hover:bg-base-300/50 flex items-center gap-2 transition-all duration-150 ease-in-out border-2`}
+                            className="btn btn-soft bg-base-300 text-base-content px-3.5 py-2 rounded-lg cursor-pointer text-md hover:bg-base-300/50 flex items-center gap-2 transition-all duration-150 ease-in-out border-2"
                             onClick={handleHome}
                         >
                             <Home size={19} className="-translate-y-[1px]" />
@@ -179,7 +180,10 @@ export default function Results() {
                                 onClick={handleNextQuiz}
                             >
                                 Next Quiz
-                                <ChevronRight size={19} className="-translate-y-[1px]" />
+                                <ChevronRight
+                                    size={19}
+                                    className="-translate-y-[1px]"
+                                />
                             </button>
                         )}
                     </div>
@@ -187,4 +191,5 @@ export default function Results() {
             </div>
         </>
     );
+    
 }

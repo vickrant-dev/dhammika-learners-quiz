@@ -144,77 +144,94 @@ export default function AccordionTm() {
         <>
             <div
                 id="Accordion"
-                className="cursor-pointer flex flex-col gap-5 w-full mt-7 "
-            >   
-                {loading.progressLoading ? 
-                    (
-                        <>
-                            <p><span className="loading loading-spinner loading-md mr-3"></span>Loading</p>
-                        </>
-                    ) : (
-                        <>
-                            {assiData?.map((item, index) => { // assiData contains the plan that I enrolled into
-                                
-                                const linkedModules = modulesData.filter((mod) => mod.id == item.module_id);
-                                
-                                return linkedModules?.map((lmod) => (
+                className="cursor-pointer flex flex-col gap-5 w-full mt-7"
+            >
+                {loading.progressLoading ? (
+                    <p className="flex items-center">
+                        <span className="loading loading-spinner loading-md mr-3"></span>
+                        Loading
+                    </p>
+                ) : (
+                    assiData?.map((item, index) => {
+                        const linkedModule = modulesData.find(
+                            (mod) => mod.id == item.module_id
+                        );
+                        if (!linkedModule) return null;
 
-                                    <div
-                                        key={`${index}-${lmod.id}`}
-                                        id="AccordionItem"
-                                        className="overflow-y-hidden overflow-x-hidden shadow-md/4 border border-base-300 rounded-2xl p-5"
-                                    >
-                                        <div
-                                            id="AccordionTrigger"
-                                            className="flex items-center justify-between font-semibold pb-1"
-                                        >
-                                            <span className="text-2xl flex items-center gap-3" >
-                                                
-                                                <p className="text-lg font-medium">{lmod.name}</p>
-                                                {item.completed === 'false' ? (
-                                                    <div className="badge px-2.5 text-base-100 bg-orange-500 rounded-xl">நிலுவையில் உள்ளது</div>
-                                                ) : (
-                                                    <div className="badge px-2.5 text-base-100 bg-green-500 rounded-xl">முடிக்கப்பட்டது</div>
-                                                )}
-                                            </span>
-                                        </div>
-                                        <div id="desc">
-                                            <span className="text-sm text-neutral-500" >{lmod.description}</span>
-                                        </div>
-                                    </div>
-                                )
-                                )
-
-                            })}
-                        </>
-                    )}
-            </div>
-            <div className="lessons-attended-sec mt-15 mb-10">
-                {lessonsData?.filter((lessD) => lessD.status === "completed").map((lessD) => (
-                    <div className="lesson-card">
-                        <div className="header">
-                            <h1 className='text-2xl mt-10 font-semibold'>கலந்துகொண்ட பாடங்கள்</h1>
-                            <p className='mt-1.75 text-sm text-neutral-500'>உங்கள் ஓட்டுநர் பாடங்களைக் கண்காணிக்கவும்</p>
-                        </div>
-                        <div className="content mt-7">
-                            <div className="content-container flex items-center justify-between border border-base-300 shadow-md/4 p-5 rounded-2xl">
-                                <div className="left">
-                                    <div className="lesson-title flex items-center gap-4">
-                                        <h4 className='text-md font-medium'>{lessD.lesson_name}</h4>
-                                        <div className="badge-md px-2.5 text-base-100 bg-green-500 rounded-full">முடிக்கப்பட்டது</div>
+                        return (
+                            <div
+                                key={`${index}-${linkedModule.id}`}
+                                id="AccordionItem"
+                                className="overflow-hidden shadow-md/4 border border-base-300 rounded-2xl p-5 w-full"
+                            >
+                                <div
+                                    id="AccordionTrigger"
+                                    className="flex flex-col sm:flex-row items-start sm:items-center justify-between font-semibold pb-1 gap-2"
+                                >
+                                    <div className="text-xl sm:text-2xl flex items-center gap-3">
+                                        <p className="text-lg sm:text-xl font-medium">
+                                            {linkedModule.name}
+                                        </p>
+                                        {item.completed === "false" ? (
+                                            <div className="badge px-2.5 text-base-100 bg-orange-500 rounded-xl text-xs sm:text-sm">
+                                                நிலுவையில் உள்ளது
+                                            </div>
+                                        ) : (
+                                            <div className="badge px-2.5 text-base-100 bg-green-500 rounded-xl text-xs sm:text-sm">
+                                                முடிக்கப்பட்டது
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                                <div className="right">
-                                    <div className="completed-date flex items-center gap-3">
-                                        <CheckCircle size={18} className='text-green-500'/>
-                                        {/* <p>March 20, 2024</p>  */}
-                                        <p>{lessD.scheduled_date}</p>
+                                <div id="desc">
+                                    <span className="text-sm sm:text-base text-neutral-500 block mt-1">
+                                        {linkedModule.description}
+                                    </span>
+                                </div>
+                            </div>
+                        );
+                    })
+                )}
+            </div>
+
+            <div className="lessons-attended-sec mt-12 mb-10">
+                {lessonsData
+                    ?.filter((lessD) => lessD.status === "completed")
+                    .map((lessD, index) => (
+                        <div key={index} className="lesson-card w-full mt-5">
+                            <div className="header">
+                                <h1 className="text-xl sm:text-2xl font-semibold">
+                                    கலந்துகொண்ட பாடங்கள்
+                                </h1>
+                                <p className="mt-2 text-sm sm:text-base text-neutral-500">
+                                    உங்கள் ஓட்டுநர் பாடங்களைக் கண்காணிக்கவும்
+                                </p>
+                            </div>
+                            <div className="content mt-5">
+                                <div className="content-container flex flex-col sm:flex-row items-start sm:items-center justify-between border border-base-300 shadow-md/4 p-5 rounded-2xl gap-4 sm:gap-0">
+                                    <div className="left">
+                                        <div className="lesson-title flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                                            <h4 className="text-md sm:text-lg font-medium">
+                                                {lessD.lesson_name}
+                                            </h4>
+                                            <div className="badge-md px-2.5 text-base-100 bg-green-500 rounded-full text-xs sm:text-sm">
+                                                முடிக்கப்பட்டது
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="right">
+                                        <div className="completed-date flex items-center gap-2 sm:gap-3 text-sm sm:text-base">
+                                            <CheckCircle
+                                                size={18}
+                                                className="text-green-500"
+                                            />
+                                            <p>{lessD.scheduled_date}</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                ))}
+                    ))}
             </div>
         </>
     );

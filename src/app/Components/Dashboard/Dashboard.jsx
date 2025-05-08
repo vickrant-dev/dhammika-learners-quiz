@@ -107,32 +107,36 @@ export default function Dashboard() {
 
     return (
         <>
-            <div id="dashboard-container">
-                <h1 className="text-2xl mt-10 font-semibold">Dashboard</h1>
+            <div
+                id="dashboard-container"
+                className="pl-[1.75rem] lg:pl-[2.25rem] md:pl-[2.25rem] sm:pl-[2.25rem] pr-4 lg:pr-8 sm:pr-6"
+            >
+                <h1 className="text-2xl font-semibold">Dashboard</h1>
                 <div
                     id="dashboard-cards"
-                    className="mt-7 flex justify-between gap-5"
-                >   
-                    <div className="stats shadow-md/5 border border-base-300 rounded-xl w-full">
+                    className="mt-7 flex flex-col lg:flex-row justify-between gap-5"
+                >
+                    <div className="stats shadow-md/5 border border-base-300 rounded-xl w-full lg:w-1/2">
                         <div className="stat">
                             <div className="stat-title text-sm mb-1.5">
                                 Overall Progress
                             </div>
                             {loading.progressLoading ? (
+                                <span className="loading loading-spinner loading-md"></span>
+                            ) : (
                                 <>
-                                    <span className="loading loading-spinner loading-md"></span>
-                                </>
-                            ): ( 
-                                <>        
                                     <div className="stat-value flex items-center justify-between">
                                         <p className="font-bold">
                                             {assiData?.length > 0
-                                                ? (assiData.filter(
-                                                    (mod) => mod.completed === "true"
-                                                ).length /
-                                                    assiData.length) *
-                                                    100 +
-                                                "%"
+                                                ? (
+                                                      (assiData.filter(
+                                                          (mod) =>
+                                                              mod.completed ===
+                                                              "true"
+                                                      ).length /
+                                                          assiData.length) *
+                                                      100
+                                                  ).toFixed(0) + "%"
                                                 : 0}
                                         </p>
                                         <CircleCheck
@@ -146,12 +150,12 @@ export default function Dashboard() {
                                             value={
                                                 assiData?.length > 0
                                                     ? (assiData.filter(
-                                                        (lesson) =>
-                                                            lesson.completed ===
-                                                            "true"
-                                                    ).length /
-                                                        assiData.length) *
-                                                    100
+                                                          (lesson) =>
+                                                              lesson.completed ===
+                                                              "true"
+                                                      ).length /
+                                                          assiData.length) *
+                                                      100
                                                     : 0
                                             }
                                             max="100"
@@ -160,47 +164,56 @@ export default function Dashboard() {
                                     <div className="stat-desc">
                                         {assiData.length > 0
                                             ? assiData.filter(
-                                                (lesson) =>
-                                                    lesson.completed === "true"
-                                            ).length
+                                                  (lesson) =>
+                                                      lesson.completed ===
+                                                      "true"
+                                              ).length
                                             : 0}{" "}
-                                        of {assiData.length > 0 ? assiData.length : 0}{" "}
+                                        of{" "}
+                                        {assiData.length > 0
+                                            ? assiData.length
+                                            : 0}{" "}
                                         modules completed
                                     </div>
                                 </>
                             )}
                         </div>
                     </div>
-                    <div className="stats shadow-md/5 border border-base-300 rounded-xl w-full">
+                    <div className="stats shadow-md/5 border border-base-300 rounded-xl w-full lg:w-1/2">
                         <div className="stat">
                             <div className="stat-title text-sm mb-1.5">
                                 Next Lesson
                             </div>
                             {loading.lessonsLoading ? (
+                                <span className="loading loading-spinner loading-md"></span>
+                            ) : (
                                 <>
-                                    <span className="loading loading-spinner loading-md"></span>
-                                </>
-                            ): (
-                                <>
-                                    <div className="stat-value flex items-center justify-between">
-                                        <p className="font-bold">
+                                    <div className="stat-value flex items-center gap-3 justify-between">
+                                        <p className="font-bold text-lg lg:text-2xl md:text-2xl sm:text-xl">
                                             {lessonsData?.find(
                                                 (lesson) =>
-                                                    lesson.status === "scheduled"
-                                            )?.lesson_name || "Yet to be Scheduled"}
+                                                    lesson.status ===
+                                                    "scheduled"
+                                            )?.lesson_name ||
+                                                "Yet to be Scheduled"}
                                         </p>
-                                        <Clock4 className="text-blue-500" size={27} />
+                                        <Clock4
+                                            className="text-blue-500"
+                                            size={27}
+                                        />
                                     </div>
                                     <div className="stat-date">
                                         {lessonsData?.find(
-                                            (lesson) => lesson.status === "scheduled"
+                                            (lesson) =>
+                                                lesson.status === "scheduled"
                                         )?.scheduled_date || ""}
                                     </div>
                                     <div className="stat-time">
                                         {lessonsData
                                             ?.find(
                                                 (lesson) =>
-                                                    lesson.status === "scheduled"
+                                                    lesson.status ===
+                                                    "scheduled"
                                             )
                                             ?.time?.split("+")[0]
                                             .slice(0, -3) || ""}
@@ -213,4 +226,5 @@ export default function Dashboard() {
             </div>
         </>
     );
+    
 }

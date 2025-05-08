@@ -88,11 +88,10 @@ export default function WNavbar() {
                                     Login
                                 </Link>
                                 <Link
-                                    href="/get-started"
+                                    href="/student/signup"
                                     className="btn btn-primary rounded-full px-5 flex items-center"
                                 >
-                                    Book a Lesson{" "}
-                                    <ArrowRight className="ml-1" size={18} />
+                                    Signup{" "}
                                 </Link>
                             </div>
 
@@ -164,10 +163,10 @@ export default function WNavbar() {
                                 </ul>
                                 <div className="mt-4">
                                     <Link
-                                        href="/get-started"
+                                        href="/student/signup"
                                         className="btn btn-primary rounded-full px-5 flex items-center justify-center w-full"
                                     >
-                                        Book a Lesson{" "}
+                                        Signup{" "}
                                         <ArrowRight
                                             className="ml-1"
                                             size={18}

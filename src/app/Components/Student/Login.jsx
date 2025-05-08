@@ -146,11 +146,11 @@ export default function LoginPage() {
                             <p className="text-red-500 text-sm">{error}</p>
                         )}
 
-                        <div className="text-right text-xs text-base-content/60">
+                        {/* <div className="text-right text-xs text-base-content/60">
                             <Link href="/student/login/forgot-password" className="hover:underline">
                                 Forgot password?
                             </Link>
-                        </div>
+                        </div> */}
 
                         <button
                             type="submit"

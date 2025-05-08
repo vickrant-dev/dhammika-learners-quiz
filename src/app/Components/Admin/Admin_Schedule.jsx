@@ -1,4 +1,4 @@
-import { Calendar, Check, CheckCircle2, CircleAlert, Clock4 } from "lucide-react";
+import { Calendar, Check, CheckCircle2, CircleAlert, Clock4, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from '../../utils/supabase';
 
@@ -6,15 +6,18 @@ export default function AdminSchedule() {
 
     const [loading, setLoading] = useState({
         fetchlessons: false,
-        rescheduling: false
+        rescheduling: false,
+        deleteSchedule: false,
     });
     const [alert, setAlert] = useState({
         reschedule: false,
         fillForm: false,
         error: false,
+        deleteSchedule: false,
     });
     const [success, setSuccess] = useState({
         rescheduled: false,
+        deleteSchedule: false,
     })
     const [dailyScheduleForm, setDailyScheduleForm] = useState({
         date: new Date().toISOString().slice(0, 10),
@@ -342,19 +345,77 @@ export default function AdminSchedule() {
         .filter((lesson) => lesson.status === 'scheduled')
         .filter((lesson) => lesson.scheduled_date === dailyScheduleForm.date);
 
+    const handleDeleteSchedule = async (lessID) => {
+
+        // Delete schedule
+        setLoading((prev) => ({
+            ...prev,
+            deleteSchedule: true,
+        }));
+        const { error } = await supabase
+            .from("lessons")
+            .delete()
+            .eq("id", lessID);
+        
+        if (error) {
+            console.log("Error deleting lesson: ", error.message);
+            setLoading((prev) => ({
+                ...prev,
+                deleteSchedule: false,
+            }))
+            setAlert((prev) => ({
+                ...prev,
+                deleteSchedule: true,
+            }))
+            return;
+        }
+
+        setLoading((prev) => ({
+            ...prev,
+            deleteSchedule: false,
+        }))
+        setAlert((prev) => ({
+            ...prev,
+            deleteSchedule: false,
+        }))
+        setSuccess((prev) => ({
+            ...prev,
+            deleteSchedule: true
+        }))
+        console.log("Successfully deleted Lesson");
+        fetchLessons();
+
+    }
+
+    const [isMobile, setIsMobile] = useState(false);
+    
+    useEffect(() => {
+        const checkIfMobile = () => {
+        setIsMobile(window.innerWidth < 1024);
+        };
+
+        checkIfMobile();
+
+        window.addEventListener('resize', checkIfMobile);
+        return () => window.removeEventListener('resize', checkIfMobile);
+    }, []); 
+
 
     
     return (
         <>
             <div id="admin-container">
-                <div id="admin-body" className="pl-[2.25rem] pt-[0] mr-10">
+                <div
+                    id="admin-body"
+                    className="pl-[2.25rem] pt-[0] lg:mr-10 md:mr-10 sm:mr-5 mr-5"
+                >
                     <div className="title">
                         <h1 className="text-3xl font-semibold mb-7 text-primary-focus">
                             Lesson Schedule
                         </h1>
                     </div>
                     <div className="admin-schedule-container mt-10 border border-base-300 p-6 rounded-xl shadow-lg bg-base-100">
-                        <div className="header flex items-center justify-between mb-7">
+                        <div className="header flex flex-col sm:flex-row items-normal lg:items-center md:items-center sm:items-normal gap-4 lg:gap-0 md:gap-0 sm:gap-4 justify-between mb-7">
                             <div className="title">
                                 <p className="text-xl font-semibold text-primary-focus">
                                     Daily Schedule
@@ -386,9 +447,10 @@ export default function AdminSchedule() {
                                         <p>Loading</p>
                                     </div>
                                 </>
-                            ) : filteredLessons && filteredLessons.length > 0 ? (
+                            ) : filteredLessons &&
+                              filteredLessons.length > 0 ? (
                                 filteredLessons.map((lesson) => (
-                                    <div className="schedule flex items-center justify-between p-5 rounded-xl border border-base-200 shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary/20 bg-gradient-to-br from-base-100 to-base-100/95">
+                                    <div className="schedule flex items-center justify-between p-5 rounded-xl border border-base-200 gap-5 shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary/20 bg-gradient-to-br from-base-100 to-base-100/95">
                                         <div className="left flex items-center gap-4">
                                             <div className="icon bg-primary/10 border border-primary/20 rounded-full p-2.5">
                                                 <Clock4
@@ -406,7 +468,7 @@ export default function AdminSchedule() {
                                                 </p>
                                             </div>
                                         </div>
-                                        <div className="right flex gap-3">
+                                        <div className="right flex gap-3 ">
                                             <button
                                                 onClick={() =>
                                                     document
@@ -417,11 +479,21 @@ export default function AdminSchedule() {
                                                 }
                                                 className="btn btn-primary border-primary/50 text-primary-content rounded-lg py-5 shadow-md hover:shadow-lg transition-all duration-300"
                                             >
-                                                <Check
-                                                    className="mr-2"
-                                                    size={18}
-                                                />
-                                                Mark as Complete
+                                                {isMobile ? (
+                                                    <>
+                                                        <Check
+                                                            size={18}
+                                                        />
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Check
+                                                            className="mr-2"
+                                                            size={18}
+                                                        />
+                                                        Mark as Complete
+                                                    </>
+                                                )}
                                             </button>
                                             <dialog
                                                 id={lesson.id}
@@ -489,11 +561,22 @@ export default function AdminSchedule() {
                                                 }
                                                 className="btn btn-outline btn-secondary border-2 rounded-lg py-5 shadow-sm hover:shadow-md transition-all duration-300"
                                             >
-                                                <Calendar
-                                                    className="mr-2"
-                                                    size={18}
-                                                />
-                                                Re-schedule
+                                                {isMobile ? (
+                                                    <>
+                                                        <Calendar
+                                                        size={18}
+                                                        />
+                                                    </>
+                                                ): (
+                                                    <>
+                                                        <Calendar
+                                                        className="mr-2"
+                                                        size={18}
+                                                        />
+                                                        Re-schedule
+                                                    </>
+                                                )}
+                                                
                                             </button>
                                             <dialog
                                                 id="confirm-re-schedule"
@@ -582,7 +665,9 @@ export default function AdminSchedule() {
                                                             size={17}
                                                         />
                                                         <p className="text-sm text-red-500 font-medium">
-                                                            Please fill in the form before re-scheduling.
+                                                            Please fill in the
+                                                            form before
+                                                            re-scheduling.
                                                         </p>
                                                     </div>
 
@@ -619,7 +704,7 @@ export default function AdminSchedule() {
                                                                     : "Cancel"}
                                                             </button>
                                                         </form>
-                                                        { !loading.rescheduling ? (
+                                                        {!loading.rescheduling ? (
                                                             <div
                                                                 onClick={() =>
                                                                     handleReschedule(
@@ -645,9 +730,87 @@ export default function AdminSchedule() {
                                                                 className="btn btn-secondary border-2 rounded-lg"
                                                             >
                                                                 <span className="loading loading-spinner loading-md mr-2"></span>
-                                                                <p>Re-scheduling</p>
+                                                                <p>
+                                                                    Re-scheduling
+                                                                </p>
                                                             </div>
                                                         )}
+                                                    </div>
+                                                </div>
+                                            </dialog>
+                                            <button
+                                                onClick={() =>
+                                                    document
+                                                        .getElementById(
+                                                            lesson.id + "delete"
+                                                        )
+                                                        .showModal()
+                                                }
+                                                className="btn border-2 border-red-700 bg-red-500 rounded-lg py-5 shadow-sm hover:shadow-md text-red-950 transition-all duration-300"
+                                            >
+                                                <Trash size={18} />
+                                            </button>
+                                            <dialog
+                                                id={lesson.id + "delete"}
+                                                className="modal"
+                                            >
+                                                <div className="rounded-xl modal-box">
+                                                    <h3 className="font-bold text-lg">
+                                                        Do you want to delete
+                                                        this lesson?
+                                                    </h3>
+                                                    <div className="student-lesson-details mt-5">
+                                                        <div className="left flex items-center gap-4">
+                                                            <div className="icon bg-primary/10 border border-primary/20 rounded-full p-2.5">
+                                                                <Clock4
+                                                                    className="text-primary"
+                                                                    size={24}
+                                                                />
+                                                            </div>
+                                                            <div className="time-student">
+                                                                <p className="text-md font-medium text-primary-focus">
+                                                                    {
+                                                                        lesson.time.split(
+                                                                            "+"
+                                                                        )[0]
+                                                                    }
+                                                                </p>
+                                                                <p className="text-sm text-base-content/75">
+                                                                    {
+                                                                        lesson.student_name
+                                                                    }{" "}
+                                                                    •{" "}
+                                                                    {
+                                                                        lesson.lesson_name
+                                                                    }
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div
+                                                        className={`${alert.deleteSchedule ? "flex" : "hidden"} none mt-6 error-message`}
+                                                    >
+                                                        <p className="text-red-500 font-medium">
+                                                            Error Deleting
+                                                            Lesson
+                                                        </p>
+                                                    </div>
+                                                    <div className="modal-action">
+                                                        <form method="dialog">
+                                                            <button className="btn rounded-lg border-2 ">
+                                                                Close
+                                                            </button>
+                                                        </form>
+                                                        <button
+                                                            onClick={() =>
+                                                                handleDeleteSchedule(
+                                                                    lesson.id
+                                                                )
+                                                            }
+                                                            className="btn border-2 border-red-700 bg-red-500 text-red-950 rounded-lg"
+                                                        >
+                                                            Yes, Delete
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </dialog>

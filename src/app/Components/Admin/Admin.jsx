@@ -223,16 +223,17 @@ export default function Admin() {
 
     return (
         <>
-            <div id="admin-container">
-                <div id="admin-body" className="pl-[2.25rem] pt-[0] mr-10">
-                    <div className="title">
-                        <h1 className="text-3xl font-semibold mb-7 text-primary-focus">
+            <div id="admin-container" className="w-full pl-[2.25rem] pr-4 sm:pr-6 lg:pr-10">
+                <div id="admin-body">
+                    <div className="title mb-7">
+                        <h1 className="text-2xl sm:text-3xl font-semibold text-primary-focus">
                             Dashboard
                         </h1>
                     </div>
+
                     <div className="dashboard-stats">
-                        <div className="stats-container flex gap-5">
-                            <div className="stats shadow-lg/8 rounded-xl border border-base-300 w-[275px] bg-gradient-to-br from-base-100 to-base-200 transition-all duration-300 hover:shadow-xl/8 cursor-pointer">
+                        <div className="stats-container flex flex-col sm:flex-row flex-wrap gap-5">
+                            <div className="stats shadow-lg/8 rounded-xl border border-base-300 w-full sm:w-[275px] bg-gradient-to-br from-base-100 to-base-200 transition-all duration-300 hover:shadow-xl/8 cursor-pointer">
                                 <div className="stat p-6">
                                     <div className="stat-title flex items-center justify-between pb-2">
                                         <p className="text-sm font-medium text-base-content/70">
@@ -246,24 +247,16 @@ export default function Admin() {
                                         </div>
                                     </div>
                                     <div className="stat-value text-4xl font-bold text-primary">
-                                        { loading ? (
-                                            <>
-                                                <span className="loading loading-spinner loading-lg"></span>
-                                            </>
+                                        {loading ? (
+                                            <span className="loading loading-spinner loading-lg"></span>
                                         ) : (
-                                            <>
-                                                {totalStudents ? totalStudents.length : 0}
-                                            </>
+                                            totalStudents?.length || 0
                                         )}
-                                    </div>
-                                    <div className="stat-desc flex items-center gap-1 mt-1 text-success">
-                                        <span className="flex items-center text-success font-medium">
-                                            {" "}
-                                        </span>{" "}
                                     </div>
                                 </div>
                             </div>
-                            <div className="stats shadow-lg/8 rounded-xl border border-base-300 w-[275px] bg-gradient-to-br from-base-100 to-base-200 transition-all duration-300 hover:shadow-xl/8 cursor-pointer">
+
+                            <div className="stats shadow-lg/8 rounded-xl border border-base-300 w-full sm:w-[275px] bg-gradient-to-br from-base-100 to-base-200 transition-all duration-300 hover:shadow-xl/8 cursor-pointer">
                                 <div className="stat p-6">
                                     <div className="stat-title flex items-center justify-between pb-2">
                                         <p className="text-sm font-medium text-base-content/70">
@@ -277,22 +270,23 @@ export default function Admin() {
                                         </div>
                                     </div>
                                     <div className="stat-value text-4xl font-bold text-secondary">
-                                        { loading ? (
-                                            <>
-                                                <span className="loading loading-spinner loading-lg"></span>
-                                            </>
+                                        {loading ? (
+                                            <span className="loading loading-spinner loading-lg"></span>
+                                        ) : Array.isArray(scheduledLessons) ? (
+                                            scheduledLessons
+                                                .filter(
+                                                    (l) =>
+                                                        l.status === "scheduled"
+                                                )
+                                                .filter(
+                                                    (l) =>
+                                                        new Date(
+                                                            l.scheduled_date
+                                                        ) <= sevenDaysFromNow
+                                                )
+                                                .slice(0, 7).length
                                         ) : (
-                                            <>
-                                                {Array.isArray(scheduledLessons)
-                                                ? scheduledLessons
-                                                    .filter(lesson => lesson.status === 'scheduled')
-                                                    .sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date))
-                                                    .filter((scheduledLesson) => new Date(scheduledLesson.scheduled_date) <= sevenDaysFromNow)
-                                                    .slice(0, 7)
-                                                    .length
-                                                : '0'}
-
-                                            </>
+                                            0
                                         )}
                                     </div>
                                     <div className="stat-desc mt-1 text-base-content/60">
@@ -302,8 +296,9 @@ export default function Admin() {
                             </div>
                         </div>
                     </div>
-                    <div className="upcoming-lessons my-10 border border-base-300 p-6 rounded-2xl shadow-lg bg-base-100">
-                        <div className="header flex justify-between">
+
+                    <div className="upcoming-lessons my-10 border border-base-300 p-4 sm:p-6 rounded-2xl shadow-lg bg-base-100">
+                        <div className="header flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                             <div className="header-info">
                                 <h2 className="text-xl font-semibold mb-1 text-primary-focus">
                                     Upcoming Lessons
@@ -324,8 +319,9 @@ export default function Admin() {
                                     <Plus className="mr-1" size={22} /> Schedule
                                     New
                                 </button>
+
                                 <dialog id="my_modal_3" className="modal">
-                                    <div className="max-h-[90%] modal-box rounded-2xl">
+                                    <div className="modal-box w-full max-w-2xl lg:w-full max-h-[90vh] overflow-y-auto rounded-2xl">
                                         <h3 className="font-bold text-lg">
                                             Schedule New Lesson
                                         </h3>
@@ -335,57 +331,85 @@ export default function Admin() {
                                         </p>
                                         <div
                                             id="form-options"
-                                            className="flex flex-col space-y-2 mt-7"
+                                            className="flex flex-col gap-4 mt-6"
                                         >
-                                            <fieldset className="w-full fieldset">
-                                                <legend className="fieldset-legend text-sm">
+                                            <fieldset className="w-full">
+                                                <legend className="text-sm">
                                                     Student
                                                 </legend>
-                                                <select name='student_id' onChange={handleAddNewScheduleChange} value={newScheduleForm.student_id} className="w-full select border border-base-300 rounded-lg">
+                                                <select
+                                                    name="student_id"
+                                                    onChange={
+                                                        handleAddNewScheduleChange
+                                                    }
+                                                    value={
+                                                        newScheduleForm.student_id
+                                                    }
+                                                    className="w-full select border border-base-300 rounded-lg"
+                                                >
                                                     <option value="default">
                                                         Select a student
                                                     </option>
-                                                    {totalStudents ? totalStudents.map((tSTD) => (
-                                                        <option key={tSTD.id} value={tSTD.id}>
-                                                            {tSTD.full_name}
+                                                    {totalStudents?.map((s) => (
+                                                        <option
+                                                            key={s.id}
+                                                            value={s.id}
+                                                        >
+                                                            {s.full_name}
                                                         </option>
-                                                    )): ''}
+                                                    ))}
                                                 </select>
                                             </fieldset>
-                                            <fieldset className="w-full fieldset">
-                                                <legend className="fieldset-legend text-sm">
+
+                                            <fieldset className="w-full">
+                                                <legend className="text-sm">
                                                     Lesson
                                                 </legend>
                                                 <input
                                                     type="text"
-                                                    name='lesson_name' 
-                                                    onChange={handleAddNewScheduleChange} 
-                                                    value={newScheduleForm.lesson_name}
+                                                    name="lesson_name"
+                                                    onChange={
+                                                        handleAddNewScheduleChange
+                                                    }
+                                                    value={
+                                                        newScheduleForm.lesson_name
+                                                    }
                                                     className="w-full py-2.5 px-4 border border-base-300 rounded-lg"
                                                 />
                                             </fieldset>
-                                            <div className="date-time flex justify-between gap-3">
-                                                <fieldset className="w-full fieldset">
-                                                    <legend className="fieldset-legend text-sm">
+
+                                            <div className="date-time flex flex-col md:flex-row gap-3">
+                                                <fieldset className="w-full">
+                                                    <legend className="text-sm">
                                                         Date
                                                     </legend>
                                                     <input
                                                         type="date"
-                                                        name='scheduled_date'
-                                                        onChange={handleAddNewScheduleChange} 
-                                                        value={newScheduleForm.scheduled_date}
+                                                        name="scheduled_date"
+                                                        onChange={
+                                                            handleAddNewScheduleChange
+                                                        }
+                                                        value={
+                                                            newScheduleForm.scheduled_date
+                                                        }
                                                         className="w-full py-2.5 px-4 border border-base-300 rounded-lg"
                                                     />
                                                 </fieldset>
-                                                <fieldset className="w-full fieldset">
-                                                    <legend className="fieldset-legend text-sm">
+
+                                                <fieldset className="w-full">
+                                                    <legend className="text-sm">
                                                         Time
                                                     </legend>
                                                     <input
                                                         type="time"
-                                                        name='time' 
-                                                        onChange={handleAddNewScheduleChange} 
-                                                        value={newScheduleForm.time}
+                                                        name="time"
+                                                        onChange={
+                                                            handleAddNewScheduleChange
+                                                        }
+                                                        value={
+                                                            newScheduleForm.time
+                                                        }
+                                                        className="w-full py-2.5 px-4 border border-base-300 rounded-lg"
                                                         style={{
                                                             appearance: "none",
                                                             WebkitAppearance:
@@ -393,66 +417,85 @@ export default function Admin() {
                                                             MozAppearance:
                                                                 "none",
                                                         }}
-                                                        className="w-full py-2.5 px-4 border border-base-300 rounded-lg"
                                                     />
                                                 </fieldset>
                                             </div>
-                                            <fieldset className="w-full fieldset">
-                                                <legend className="fieldset-legend text-sm">
+
+                                            <fieldset className="w-full">
+                                                <legend className="text-sm">
                                                     Notes
                                                 </legend>
                                                 <textarea
                                                     className="w-full border border-base-300 rounded-lg textarea"
-                                                    name='notes' 
-                                                    onChange={handleAddNewScheduleChange} 
-                                                    value={newScheduleForm.notes}
+                                                    name="notes"
+                                                    onChange={
+                                                        handleAddNewScheduleChange
+                                                    }
+                                                    value={
+                                                        newScheduleForm.notes
+                                                    }
                                                     placeholder="Add any notes about this lesson"
                                                 ></textarea>
                                             </fieldset>
                                         </div>
-                                        <div className="user-alert-sec">
-                                            <div className="student-exists-err">
-                                                {alert.studentExists ? (
-                                                    <div className='my-3 flex items-center'>
-                                                        <CircleAlert size={18} className='text-red-500 mr-2'/> 
-                                                        <p className='text-red-500 text-sm'>There is already a pending lesson for this student</p>
-                                                    </div>
-                                                ) : (
-                                                    ''
-                                                )}
-                                                {alert.errorInserting ? (
-                                                    <div className='my-3 flex items-center'>
-                                                        <CircleAlert size={18} className='text-red-500 mr-2'/> 
-                                                        <p className='text-red-500 text-sm'>Error inserting data to database</p>
-                                                    </div>
-                                                ) : (
-                                                    ''
-                                                )}
-                                                {alert.formNotFilled ? (
-                                                    <div className='my-3 flex items-center'>
-                                                        <CircleAlert size={18} className='text-red-500 mr-2'/> 
-                                                        <p className='text-red-500 text-sm'>Please fill in the form</p>
-                                                    </div>
-                                                ) : (
-                                                    ''
-                                                )}
-                                                {success.lessonAdded ? (
-                                                    <div className='my-3 flex items-center'>
-                                                        <CheckCircle2 size={18} className='text-green-500 mr-2'/> 
-                                                        <p className='text-green-500 text-sm'>Successfully added a new lesson</p>
-                                                    </div>
-                                                ) : (
-                                                    ''
-                                                )}
-                                            </div>
+
+                                        <div className="user-alert-sec mt-4">
+                                            {alert.studentExists && (
+                                                <div className="flex items-center text-red-500 text-sm mb-2">
+                                                    <CircleAlert
+                                                        size={18}
+                                                        className="mr-2"
+                                                    />
+                                                    There is already a pending
+                                                    lesson for this student
+                                                </div>
+                                            )}
+                                            {alert.errorInserting && (
+                                                <div className="flex items-center text-red-500 text-sm mb-2">
+                                                    <CircleAlert
+                                                        size={18}
+                                                        className="mr-2"
+                                                    />
+                                                    Error inserting data to
+                                                    database
+                                                </div>
+                                            )}
+                                            {alert.formNotFilled && (
+                                                <div className="flex items-center text-red-500 text-sm mb-2">
+                                                    <CircleAlert
+                                                        size={18}
+                                                        className="mr-2"
+                                                    />
+                                                    Please fill in the form
+                                                </div>
+                                            )}
+                                            {success.lessonAdded && (
+                                                <div className="flex items-center text-green-500 text-sm mb-2">
+                                                    <CheckCircle2
+                                                        size={18}
+                                                        className="mr-2"
+                                                    />
+                                                    Successfully added a new
+                                                    lesson
+                                                </div>
+                                            )}
                                         </div>
-                                        <div className="mt-5 close-add-div flex items-center justify-end gap-3">
+
+                                        <div className="mt-5 flex items-center justify-end gap-3">
                                             <form method="dialog">
-                                                <button onClick={handleCloseNewSchedule} className="border-2 btn btn-default rounded-lg">
+                                                <button
+                                                    onClick={
+                                                        handleCloseNewSchedule
+                                                    }
+                                                    className="btn btn-default border-2 rounded-lg"
+                                                >
                                                     Close
                                                 </button>
                                             </form>
-                                            <button onClick={handleAddNewSchedule} className="border-2 btn btn-primary rounded-lg">
+                                            <button
+                                                onClick={handleAddNewSchedule}
+                                                className="btn btn-primary border-2 rounded-lg"
+                                            >
                                                 Add Schedule
                                             </button>
                                         </div>
@@ -460,15 +503,28 @@ export default function Admin() {
                                 </dialog>
                             </div>
                         </div>
+
                         <div className="lessons-table flex flex-col gap-6 pt-7">
-                            {scheduledLessons ? (
+                            {scheduledLessons?.length ? (
                                 scheduledLessons
-                                    ?.sort((a, b) => new Date(a.scheduled_date) - new Date(b.scheduled_date))
-                                    .filter((scheduledLesson) => scheduledLesson.status === 'scheduled' && new Date(scheduledLesson.scheduled_date) <= sevenDaysFromNow )
-                                    .slice(0, 7).map((scheduledLesson) => (
-                                    <div className="row flex justify-between border border-base-200 rounded-2xl p-5 bg-base-100 shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary/20">
-                                        <div className="left">
-                                            <div className="user flex gap-4">
+                                    .sort(
+                                        (a, b) =>
+                                            new Date(a.scheduled_date) -
+                                            new Date(b.scheduled_date)
+                                    )
+                                    .filter(
+                                        (l) =>
+                                            l.status === "scheduled" &&
+                                            new Date(l.scheduled_date) <=
+                                                sevenDaysFromNow
+                                    )
+                                    .slice(0, 7)
+                                    .map((lesson, i) => (
+                                        <div
+                                            key={i}
+                                            className="row flex flex-col md:flex-row justify-between border border-base-200 rounded-2xl p-4 sm:p-5 bg-base-100 shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary/20"
+                                        >
+                                            <div className="user flex flex-col sm:flex-row gap-4">
                                                 <div className="user-avatar pt-1.25">
                                                     <div className="bg-primary/10 rounded-full p-1 border border-primary/20">
                                                         <img
@@ -482,14 +538,16 @@ export default function Admin() {
                                                 </div>
                                                 <div className="user-info">
                                                     <h3 className="text-lg font-medium text-primary-focus">
-                                                        { totalStudents ? totalStudents.map((totalStd) => (
-                                                            totalStd.id === scheduledLesson.student_id ? totalStd.full_name : ''
-                                                        )) :(
-                                                            ''
-                                                        ) }
+                                                        {
+                                                            totalStudents?.find(
+                                                                (s) =>
+                                                                    s.id ===
+                                                                    lesson.student_id
+                                                            )?.full_name
+                                                        }
                                                     </h3>
                                                     <p className="text-base-content/80 font-medium">
-                                                        {scheduledLesson.lesson_name}
+                                                        {lesson.lesson_name}
                                                     </p>
                                                     <p className="flex flex-wrap mt-2.5 gap-3 text-base-content/60">
                                                         <span className="flex items-center gap-2 bg-base-200/50 px-2 py-1 rounded-lg">
@@ -497,30 +555,36 @@ export default function Admin() {
                                                                 size={16}
                                                                 className="text-primary"
                                                             />
-                                                            {scheduledLesson.scheduled_date}
+                                                            {
+                                                                lesson.scheduled_date
+                                                            }
                                                         </span>
                                                         <span className="flex items-center gap-2 bg-base-200/50 px-2 py-1 rounded-lg">
                                                             <Clock4
                                                                 size={16}
                                                                 className="text-secondary"
                                                             />
-                                                            {scheduledLesson.time.split('+')[0]}
+                                                            {
+                                                                lesson.time.split(
+                                                                    "+"
+                                                                )[0]
+                                                            }
                                                         </span>
                                                     </p>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))
+                                    ))
                             ) : (
-                                <>
-                                    <p className='mt-3 text-md font-medium'>No Upcoming Lessons for the next 7 days</p>
-                                </>
-                            ) }
+                                <p className="mt-3 text-md font-medium">
+                                    No Upcoming Lessons for the next 7 days
+                                </p>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
         </>
     );
+    
 }

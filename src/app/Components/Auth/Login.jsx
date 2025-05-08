@@ -138,11 +138,11 @@ export default function LoginPage() {
                         )}
 
                         {/* Forgot Password Link */}
-                        <div className="text-right text-xs text-base-content/60">
-                            <Link href="/login/forgot-password" className="hover:underline">
+                        {/* <div className="text-right text-xs text-base-content/60">
+                            <Link href="/login/forgotPassword" className="hover:underline">
                                 Forgot password?
                             </Link>
-                        </div>
+                        </div> */}
 
                         {/* Submit Button */}
                         <button

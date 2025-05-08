@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { quizData } from "@/utils/quizData"; // Adjust if needed
-import { quizPaper } from "@/utils/quizChoice"; // Adjust if needed
+import { quizData } from "../../utils/quizData"; // Adjust if needed
+import { quizPaper } from "../../utils/quizChoice";
 import { supabase } from "@/app/utils/supabase";
 import {
     Award,
@@ -64,7 +64,8 @@ export default function ResultsTm() {
         }
     }, [router, quizLink]);
 
-    const results = Number(localStorage.getItem("quizScore") || 0);
+    const results = (localStorage.getItem("quizScore") || 0);
+    const storedResults = Number.parseInt(results);
     const timeTaken = Number(localStorage.getItem("time-taken") || 0);
     const minutes = Math.floor(timeTaken / 60);
     const seconds = timeTaken % 60;
@@ -72,87 +73,114 @@ export default function ResultsTm() {
 
     let performanceMessage = "";
     if (scorePercentage >= 80) {
-        performanceMessage = "Excellent work!";
+        performanceMessage = "சிறப்பான பணி!";
     } else if (scorePercentage >= 60) {
-        performanceMessage = "Good job!";
+        performanceMessage = "நல்ல வேலை!";
     } else if (scorePercentage >= 40) {
-        performanceMessage = "Nice effort!";
+        performanceMessage = "நல்ல முயற்சி!";
     } else {
-        performanceMessage = "Keep practicing!";
+        performanceMessage = "தொடர்ந்து பயிற்சி செய்யுங்கள்!";
     }
 
     return (
-        <div className="results-container">
-            <div className="results-card">
-                <div className="results-header">
-                    <div className="results-title">
-                        <Award size={40} className="results-icon" />
-                        <h2>Quiz Results</h2>
-                    </div>
-                    <button className="restart-button" onClick={restartQuiz}>
-                        <RotateCcw size={18} />
-                        <span>Restart</span>
-                    </button>
-                </div>
-
-                <div className="results-summary">
-                    <div className="performance-message">
-                        <h3>{performanceMessage}</h3>
-                    </div>
-
-                    <div className="score-display">
-                        <div className="score-circle">
-                            <div className="score-number">{results}</div>
-                            <div className="score-total">/{quizData.length}</div>
+        <>
+            <div className="flex -mt-[0.28rem] pl-[1.25rem] lg:pl-[2.25rem] md:pl-[2.25rem] sm:pl-[2.25rem] pr-4 lg:pr-8 md:pr-8 sm:pr-4 ">
+                <div className="w-full border border-base-300 rounded-2xl shadow-lg/4 p-6 sm:p-8 space-y-6 sm:space-y-8 bg-base-100">
+                    {/* Header */}
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div className="flex items-center gap-3 text-gray-800">
+                            <Award size={30} className="text-primary" />
+                            <h2 className="text-lg sm:text-xl font-semibold">
+                                வினாடி வினா முடிவுகள்
+                            </h2>
                         </div>
+                        <button
+                            onClick={restartQuiz}
+                            className="btn btn-soft flex items-center gap-2 text-sm bg-base-300 hover:bg-base-300/50 text-gray-800 cursor-pointer rounded-lg transition-all duration-150 ease-in-out border-2"
+                        >
+                            <RotateCcw size={16} />
+                            மறுதொடக்கம்
+                        </button>
+                    </div>
 
-                        <div className="score-progress">
-                            <div className="progress-label">
-                                <span>Score</span>
+                    {/* Performance Message */}
+                    <div className="flex items-center justify-center font-medium text-base sm:text-lg text-primary text-center">
+                        {performanceMessage}
+                    </div>
+
+                    {/* Score Section */}
+                    <div className="flex flex-col items-center space-y-4">
+                        <div className="text-3xl sm:text-4xl font-semibold text-neutral">
+                            {storedResults}/{quizData.length}
+                        </div>
+                        <div className="w-full">
+                            <div className="flex justify-between text-sm text-gray-500 mb-1">
+                                <span>மதிப்பெண்</span>
                                 <span>{scorePercentage}%</span>
                             </div>
-                            <div className="progress-bar">
-                                <div
-                                    className="progress-fill"
-                                    style={{ width: `${scorePercentage}%` }}
-                                ></div>
+                            <progress
+                                className="progress progress-neutral w-full h-2"
+                                value={scorePercentage}
+                                max="100"
+                            ></progress>
+                        </div>
+                    </div>
+
+                    {/* Time Taken */}
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-gray-700">
+                        <Clock size={24} className="text-primary" />
+                        <div>
+                            <div className="text-sm font-medium">
+                                எடுக்கப்பட்ட நேரம்
+                            </div>
+                            <div className="text-sm">
+                                {minutes > 0 &&
+                                    `${minutes} ${minutes === 1 ? "நிமிடம்" : "நிமிடங்கள்"} `}
+                                {seconds} வினாடிகள்
                             </div>
                         </div>
                     </div>
 
-                    <div className="time-display">
-                        <Clock size={40} className="time-icon" />
-                        <div className="time-details">
-                            <span className="time-label">Time Taken</span>
-                            <span className="time-value">
-                                {minutes > 0 && `${minutes} ${minutes === 1 ? "minute" : "minutes"} `}
-                                {seconds} seconds
-                            </span>
-                        </div>
+                    {/* Navigation */}
+                    <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center pt-4 border-t border-gray-200 gap-4 sm:gap-0">
+                        {quizNumber > 1 ? (
+                            <button
+                                className="btn btn-soft bg-base-300 text-base-content px-3.5 py-2 rounded-md cursor-pointer text-md hover:bg-base-300/50 hover:text-neutral flex items-center gap-2 transition border-2"
+                                onClick={handlePrevQuiz}
+                            >
+                                <ChevronLeft
+                                    size={19}
+                                    className="-translate-y-[1px]"
+                                />
+                                முந்தைய வினாடிவினா
+                            </button>
+                        ) : (
+                            <div className={`${quizNumber > 1 ? "flex" :"hidden"}`}></div>
+                        )}
+
+                        <button
+                            className="btn btn-soft bg-base-300 text-base-content px-3.5 py-2 rounded-lg cursor-pointer text-md hover:bg-base-300/50 flex items-center gap-2 transition-all duration-150 ease-in-out border-2"
+                            onClick={handleHome}
+                        >
+                            <Home size={19} className="-translate-y-[1px]" />
+                            வீடு
+                        </button>
+
+                        {quizNumber < quizPaper.length && (
+                            <button
+                                className="btn btn-primary border-2 bg-primary text-primary-content rounded-lg cursor-pointer text-md flex items-center gap-2 transition-all duration-150 ease-in-out"
+                                onClick={handleNextQuiz}
+                            >
+                                அடுத்த வினாடிவினா
+                                <ChevronRight
+                                    size={19}
+                                    className="-translate-y-[1px]"
+                                />
+                            </button>
+                        )}
                     </div>
                 </div>
-
-                <div className="results-navigation">
-                    {quizNumber > 1 && (
-                        <button className="nav-button prev-button" onClick={handlePrevQuiz}>
-                            <ChevronLeft size={20} />
-                            <span>Previous Quiz</span>
-                        </button>
-                    )}
-
-                    <button className="nav-button home-button" onClick={handleHome}>
-                        <Home size={20} />
-                        <span>Home</span>
-                    </button>
-
-                    {quizNumber < quizPaper.length && (
-                        <button className="nav-button next-button" onClick={handleNextQuiz}>
-                            <span>Next Quiz</span>
-                            <ChevronRight size={20} />
-                        </button>
-                    )}
-                </div>
             </div>
-        </div>
+        </>
     );
 }

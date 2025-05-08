@@ -9,6 +9,7 @@ import Timer from "./Timer";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "@/app/utils/supabase";
 import "./QuizStyles.css";
+import Image from "next/image";
 
 export default function QuizSm() {
     const router = useRouter();
@@ -105,10 +106,11 @@ export default function QuizSm() {
     };
 
     return (
-        <div className="quiz flex items-center my-7">
+        <div className="quiz flex -mt-[0.28rem] pl-[1.25rem] lg:pl-[2.25rem] md:pl-[2.25rem] sm:pl-[2.25rem] pr-4 lg:pr-8 md:pr-8 sm:pr-4 mb-7">
             <div className="quiz-container w-full bg-primary-content/18 rounded-xl overflow-hidden border border-base-300 shadow-lg/6 backdrop-blur-sm bg-opacity-90">
-                <div className="heading p-6 border-b border-neutral/10 flex justify-between items-center">
-                    <h2 className="text-2xl font-semibold">Quiz</h2>
+                {/* Header */}
+                <div className="heading p-4 sm:p-6 border-b border-neutral/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <h2 className="text-xl sm:text-2xl font-semibold">ප්‍රශ්නාවලිය</h2>
                     <Timer
                         onTimeUp={handleTimeUp}
                         isSubmitted={isSubmitted}
@@ -116,16 +118,19 @@ export default function QuizSm() {
                     />
                 </div>
 
-                <div className="qa-container p-6">
-                    <div className="img-container flex">
+                {/* Question/Answer Body */}
+                <div className="qa-container p-4 sm:p-6">
+                    {/* Question + Image */}
+                    <div className="img-container flex flex-col sm:flex-row gap-5 items-start">
                         {quizData[currentQuestion].src && (
-                            <img
+                            <Image
                                 src={quizData[currentQuestion].src}
                                 width={130}
-                                alt="quiz"
+                                alt="quizImage"
+                                className="rounded-md"
                             />
                         )}
-                        <div className="q-container text-xl font-medium ml-6">
+                        <div className="q-container text-base sm:text-lg font-medium">
                             <p>
                                 {currentQuestion + 1}.{" "}
                                 {quizData[currentQuestion].question}
@@ -133,64 +138,53 @@ export default function QuizSm() {
                         </div>
                     </div>
 
-                    <div className="a-container mt-8 flex flex-col gap-4">
-                        {quizData[currentQuestion].answers.map((answer, index) => {
-                            const selected = selectedAnswers[currentQuestion];
-                            const isSelected = selected?.index === index;
-                            const isCorrect = answer.correct;
-
-                            let className =
-                                "list-none transition-all duration-150 ease-in-out border border-primary/20 hover:bg-primary-content/70 p-4.25 rounded-lg cursor-pointer";
-
-                            if (selected) {
-                                className += " disabled";
-                                if (isSelected && isCorrect) className += " correct";
-                                else if (isSelected) className += " wrong";
-                                else if (isCorrect) className += " correct";
-                            }
-
-                            return (
+                    {/* Answers */}
+                    <div className="a-container mt-6 sm:mt-8 flex flex-col gap-4">
+                        {quizData[currentQuestion].answers.map(
+                            (answer, index) => (
                                 <li
+                                    className="list-none transition-all duration-150 ease-in-out border border-primary/20 hover:bg-primary-content/70 p-4 rounded-lg cursor-pointer text-sm sm:text-base"
                                     key={index}
-                                    className={className}
-                                    onClick={() => handleAnswerCheck(index, answer)}
+                                    onClick={(e) =>
+                                        handleAnswerCheck(e, answer, index)
+                                    }
+                                    data-is-correct={`${answer.correct}`}
                                 >
                                     {answer.text}
                                 </li>
-                            );
-                        })}
+                            )
+                        )}
                     </div>
                 </div>
 
-                <div className="p-6 border-t border-neutral/10 flex items-center justify-between mt-1">
+                {/* Footer Navigation */}
+                <div className="p-4 sm:p-6 border-t border-neutral/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <p className="text-sm text-base-content/90">
                         {currentQuestion + 1} of {quizData.length} questions
                     </p>
 
-                    <div className="flex gap-3">
+                    <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                         <button
                             onClick={handleBack}
-                            className={`rounded-md btn btn-primary w-[100px] ${
+                            className={`w-full sm:w-[100px] rounded-md ${
                                 currentQuestion > 0
-                                    ? "bg-primary-content/50 text-primary"
-                                    : "opacity-50 cursor-not-allowed"
-                            }`}
-                            disabled={currentQuestion === 0}
+                                    ? "back-btn active"
+                                    : "back-btn"
+                            } border border-primary/50 btn btn-primary bg-primary-content/50 text-primary`}
                         >
-                            Back
+                            ආපසු
                         </button>
-
                         <button
                             onClick={
                                 currentQuestion === quizData.length - 1
                                     ? handleSubmit
                                     : handleNext
                             }
-                            className="rounded-md btn btn-primary w-[100px]"
+                            className="w-full sm:w-[100px] rounded-md next-btn btn btn-primary"
                         >
                             {currentQuestion === quizData.length - 1
-                                ? "Submit"
-                                : "Next"}
+                                ? "ඉදිරිපත් කරන්න"
+                                : "ඊළඟ"}
                         </button>
                     </div>
                 </div>
