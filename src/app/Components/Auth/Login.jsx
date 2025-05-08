@@ -71,7 +71,7 @@ export default function LoginPage() {
             <div className="absolute inset-0 bg-black/40 z-0"></div>
 
             {/* Content Card */}
-            <div className="relative z-10 flex flex-col w-1/3 overflow-hidden rounded-3xl shadow-xl border border-base-300 bg-white/80 backdrop-blur-md">
+            <div className="relative z-10 flex flex-col w-fit overflow-hidden rounded-3xl shadow-xl border border-base-300 bg-white/80 backdrop-blur-md">
                 <div className="w-full p-6 sm:p-8">
                     {/* Logo */}
                     <div className="flex justify-center mb-6">
