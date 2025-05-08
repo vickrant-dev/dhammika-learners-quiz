@@ -1,7 +1,6 @@
 'use client'
 import { Calendar, CheckCircle2, CircleAlert, Clock4, Plus, UserRound } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Resend } from 'resend';
 import { supabase } from '../../utils/supabase.js';
 
 export default function Admin() {
