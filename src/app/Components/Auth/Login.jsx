@@ -71,7 +71,7 @@ export default function LoginPage() {
             <div className="absolute inset-0 bg-black/40 z-0"></div>
 
             {/* Content Card */}
-            <div className="relative z-10 flex flex-col w-fit overflow-hidden rounded-3xl shadow-xl border border-base-300 bg-white/80 backdrop-blur-md">
+            <div className="relative z-10 flex flex-col w-100 overflow-hidden rounded-3xl shadow-xl border border-base-300 bg-white/80 backdrop-blur-md">
                 <div className="w-full p-6 sm:p-8">
                     {/* Logo */}
                     <div className="flex justify-center mb-6">
@@ -84,7 +84,7 @@ export default function LoginPage() {
                             Welcome Back
                         </h2>
                         <p className="mt-2 text-sm text-base-content/60">
-                            Please login to your account
+                            Sign in with your email
                         </p>
                     </div>
 
@@ -153,6 +153,11 @@ export default function LoginPage() {
                             Login
                         </button>
                     </form>
+                    <div className="mt-5 login-option">
+                        <Link href="/login-otp">
+                            <p className="font-sm flex items-center justify-center underline underline-offset-2 text-sm">Login with OTP</p>
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1044,7 +1044,7 @@ export default function AdminStudents() {
                                         <div className="modal-action">
                                             <form method="dialog">
                                                 <button className="btn rounded-lg border-2">
-                                                    Cancel
+                                                    Close
                                                 </button>
                                             </form>
                                             <div className="save-confirm-btn">

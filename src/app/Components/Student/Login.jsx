@@ -50,15 +50,15 @@ export default function LoginPage() {
             return;
         }
 
-        const { data:updateStdData, error:updateStdErr } = await supabase
-            .from('registered_users')
-            .update({ auth_student_id: userId })
-            .eq('email_copy', email);
+        // const { data:updateStdData, error:updateStdErr } = await supabase
+        //     .from('registered_users')
+        //     .update({ auth_student_id: userId })
+        //     .eq('email_copy', email);
 
-        if(updateStdErr) {
-            console.log(updateStdErr.message);
-            return;
-        }
+        // if(updateStdErr) {
+        //     console.log(updateStdErr.message);
+        //     return;
+        // }
 
         router.push('/dashboard');
         setTimeout(() => {

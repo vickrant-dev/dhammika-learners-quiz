@@ -42,7 +42,7 @@ export default function LoginPage() {
                     email: email,
                     password: password,
                     options: {
-                        emailRedirectTo: "http://localhost:3000/student/login"
+                        emailRedirectTo: "https://dhammika-learners-next-47fz1sxsd.vercel.app/student/login"
                     } 
                 });
         
