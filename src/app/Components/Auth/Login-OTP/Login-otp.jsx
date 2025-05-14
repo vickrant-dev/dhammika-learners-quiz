@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import logo from "../../assets/logo.png";
+import logo from "../../../assets/logo.png";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
@@ -32,7 +32,7 @@ export default function LoginPage() {
             setError(error.message);
         } else {
             setMessage("Redirecting...");
-            router.push(`/student/login/confirm?email=${encodeURIComponent(email)}`)     
+            router.push(`/login-otp/confirm?email=${encodeURIComponent(email)}`)     
         }
 
         setLoading(false);
@@ -43,7 +43,7 @@ export default function LoginPage() {
             {/* Background and overlay */}
             <div
                 className="absolute inset-0 z-0 bg-cover bg-center opacity-70 scale-110"
-                style={{ backgroundImage: "url('/bg-images/cyberpunk-wallpaper-2.jpg')" }}
+                style={{ backgroundImage: "url('/bg-images/road-bg.jpg')" }}
             ></div>
             <div className="absolute inset-0 bg-black/30 z-0"></div>
 
@@ -82,6 +82,11 @@ export default function LoginPage() {
                             {loading ? "Sending..." : "Send OTP"}
                         </button>
                     </form>
+                    <div className="mt-5 login-option">
+                        <Link href="/login">
+                            <p className="font-sm flex items-center justify-center underline underline-offset-2 text-sm">Login with Password</p>
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>
