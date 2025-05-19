@@ -132,6 +132,10 @@ export default function LoginPage() {
                             </button>
                         </div>
 
+                        <div className="forgot-pass flex justify-end text-sm underline underline-offset-2">
+                            <Link href='/login/forgot-password'>Forgot Password</Link>
+                        </div>
+
                         {/* Error Message */}
                         {error && (
                             <p className="text-red-500 text-sm">{error}</p>

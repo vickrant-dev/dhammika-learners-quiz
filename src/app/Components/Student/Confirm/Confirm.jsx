@@ -35,6 +35,7 @@ export default function OtpVerifyPage() {
 
         if (error) {
             setError(error.message);
+            setLoading(false);
             return;
         }
         setMessage('Login successful! Redirecting...');
