@@ -12,7 +12,7 @@ export default function ForgotPassword() {
         e.preventDefault();
         setLoading(true);
 
-        const { data, error } = await supabase.auth.resetPasswordForEmail(email, {  redirectTo: 'http://localhost:3000/login/forgot-password/reset',});
+        const { data, error } = await supabase.auth.resetPasswordForEmail(email, {  redirectTo: 'https://dhammika-learners-next.vercel.app/login/forgot-password/reset',});
         setSent(true);
         setLoading(false);
 
