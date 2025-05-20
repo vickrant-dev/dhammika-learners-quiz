@@ -1,10 +1,12 @@
 "use client";
 
 import {
+    Book,
     Calendar,
     CheckCircle2,
     CircleAlert,
     Download,
+    Ellipsis,
     Plus,
     Search,
     Settings,
@@ -663,7 +665,7 @@ export default function AdminStudents() {
                                                     className="btn btn-ghost border-2 hover:border-primary/20 btn-circle hover:bg-primary/10 transition-colors duration-200"
                                                     onClick={() => document.getElementById(`${stData.id}`).showModal()}
                                                 >
-                                                    <Settings size={20} className="text-primary" />
+                                                    <Ellipsis size={20} className="text-primary" />
                                                 </button>
                                             </td>
                                         </tr>
@@ -699,7 +701,7 @@ export default function AdminStudents() {
                                                 className="btn btn-ghost border-2 hover:border-primary/20 btn-circle hover:bg-primary/10 transition-colors duration-200"
                                                 onClick={() => document.getElementById(`${stData.id}`).showModal()}
                                             >
-                                                <Settings size={20} className="text-primary" />
+                                                <Ellipsis size={20} className="text-primary" />
                                             </button>
                                         </div>
                                         
@@ -931,6 +933,20 @@ export default function AdminStudents() {
                                     </p>
                                 </div>
                             </div>
+                            {/* Modules stat for the modules enrolled into */}
+                            {/* <div className="modules-stat p-4 border border-base-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 bg-base-100">
+                                <div className="stat-title mb-2">
+                                    <p className="font-medium text-sm text-base-content/85">Modules Enrolled Into</p>
+                                </div>
+                                <div className="stat-desc">
+                                    <p className="flex items-center gap-2 text-sm text-base-content/80">
+                                        <Book size={16} className="text-primary" />
+                                        <span className="font-medium">
+                                            {stData.scheduled_date ? stData.scheduled_date : "Yet to be scheduled"}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div> */}
                             <div className="contact-stat p-4 border border-base-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 bg-base-100">
                                 <div className="stat-title mb-2">
                                     <p className="text-sm font-medium text-base-content/85">Contact Information</p>

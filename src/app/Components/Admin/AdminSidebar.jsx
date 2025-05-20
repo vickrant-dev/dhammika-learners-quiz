@@ -86,11 +86,11 @@ export default function AdminSidebar() {
             label: "Schedule",
             link: "/admin/schedule",
         },
-        {
-            icon: <Lightbulb size={24} />,
-            label: "Quiz Center",
-            link: "/admin/quizCenter",
-        },
+        // {
+        //     icon: <Lightbulb size={24} />,
+        //     label: "Quiz Center",
+        //     link: "/admin/quizCenter",
+        // },
     ];
 
     const supabase = createClientComponentClient();

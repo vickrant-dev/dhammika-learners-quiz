@@ -22,6 +22,9 @@ export default function AdminSchedule() {
     const [dailyScheduleForm, setDailyScheduleForm] = useState({
         date: new Date().toISOString().slice(0, 10),
     });
+    const [customDate, setCustomDate] = useState({
+        date: new Date().toISOString().slice(0, 10),
+    })
     const [rescheduleForm, setRescheduleForm] = useState({
         new_date: '',
     })
@@ -40,9 +43,16 @@ export default function AdminSchedule() {
             [name]: value
         }));
 
-        console.log(name);
-        console.log(value);
+    }
 
+    const handleCompletedLessons  = (e) => {
+
+        const { name, value } = e.target;
+
+        setCustomDate((prev) => ({
+            ...prev,
+            [name]: value
+        }));
     }
 
     const fetchLessons = async () => {
@@ -344,6 +354,10 @@ export default function AdminSchedule() {
     const filteredLessons = lessons
         .filter((lesson) => lesson.status === 'scheduled')
         .filter((lesson) => lesson.scheduled_date === dailyScheduleForm.date);
+
+    const filteredCompletedLessons = lessons
+        .filter((lesson) => lesson.status === 'completed')
+        .filter((lesson) => lesson.scheduled_date === customDate.date);
 
     const handleDeleteSchedule = async (lessID) => {
 
@@ -821,6 +835,70 @@ export default function AdminSchedule() {
                                 <p className="font-medium">
                                     No scheduled lessons on{" "}
                                     {dailyScheduleForm.date}
+                                </p>
+                            )}
+                        </div>
+                    </div>
+                    <div className="admin-completed-lessons-container mt-10 border border-base-300 p-6 rounded-xl shadow-lg bg-base-100">
+                        <div className="header flex flex-col sm:flex-row items-normal lg:items-center md:items-center sm:items-normal gap-4 lg:gap-0 md:gap-0 sm:gap-4 justify-between mb-7">
+                            <div className="title">
+                                <p className="text-xl font-semibold text-primary-focus">
+                                    Completed Lessons
+                                </p>
+                                <p className="mt-1 text-base-content/85 font-medium">
+                                    {customDate.date
+                                        ? customDate.date
+                                        : "Choose a date"}
+                                </p>
+                            </div>
+                            <div className="date-chooser">
+                                <p className="mb-1 text-base-content/75 font-medium">
+                                    Choose a Date
+                                </p>
+                                <input
+                                    type="date"
+                                    name="date"
+                                    value={customDate.date}
+                                    onChange={handleCompletedLessons}
+                                    className="btn btn-outline border-2 rounded-lg shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary/30 focus:border-primary/30"
+                                />
+                            </div>
+                        </div>
+                        <div className="schedule-lists flex flex-col gap-4">
+                            {loading.fetchlessons ? (
+                                <>
+                                    <div className="flex items-center gap-3">
+                                        <span className="loading loading-spinner loading-md"></span>
+                                        <p>Loading</p>
+                                    </div>
+                                </>
+                            ) : filteredCompletedLessons &&
+                              filteredCompletedLessons.length > 0 ? (
+                                filteredCompletedLessons.map((lesson) => (
+                                    <div className="schedule flex items-center p-5 rounded-xl border border-base-200 gap-5 shadow-sm hover:shadow-md transition-all duration-300 hover:border-primary/20 bg-gradient-to-br from-base-100 to-base-100/95">
+                                        <div className="left flex items-center gap-4">
+                                            <div className="icon bg-success/10 border border-primary/20 rounded-full p-2.5">
+                                                <CheckCircle2
+                                                    className="text-success"
+                                                    size={24}
+                                                />
+                                            </div>
+                                            <div className="time-student">
+                                                <p className="text-md font-medium text-primary-focus">
+                                                    {lesson.time.split("+")[0]}
+                                                </p>
+                                                <p className="text-sm text-base-content/75">
+                                                    {lesson.student_name} •{" "}
+                                                    {lesson.lesson_name}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="font-medium">
+                                    No completed lessons on{" "}
+                                    {customDate.date}
                                 </p>
                             )}
                         </div>
