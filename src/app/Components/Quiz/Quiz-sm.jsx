@@ -48,28 +48,45 @@ export default function QuizSm() {
         fetchUser();
     }, []);
 
-    const handleAnswerCheck = (index, answer) => {
-        if (selectedAnswers[currentQuestion] !== undefined) return;
+    const handleAnswerCheck = (e, ans, i) => {
+        if (ans.correct) {
+            setUsersAnswers({ ...usersAnswers, [currentQuestion]: i });
+            setScore((prevScore) => prevScore + 1);
+            e.target.classList.add("correct");
+        } else {
+            setUsersAnswers({ ...usersAnswers, [currentQuestion]: i });
+            e.target.classList.add("wrong");
+            [...e.target.parentElement.children].forEach((el) => {
+                if (el.dataset.isCorrect === "true") {
+                    el.classList.add("correct");
+                }
+            });
+        }
 
-        const isCorrect = answer.correct;
-        const newAnswers = { ...usersAnswers, [currentQuestion]: index };
-        setUsersAnswers(newAnswers);
-        setSelectedAnswers({ ...selectedAnswers, [currentQuestion]: { index, isCorrect } });
-
-        if (isCorrect) setScore((prev) => prev + 1);
+        [...e.target.parentElement.children].forEach((el) => {
+            el.classList.add("disabled");
+        });
     };
 
     const handleNext = () => {
-        if (usersAnswers[currentQuestion] !== undefined) {
-            setCurrentQuestion((prev) => prev + 1);
-        } else {
-            alert("Please answer the current question before proceeding.");
+        if (currentQuestion !== quizData.length - 1) {
+            if (usersAnswers[currentQuestion] !== undefined) {
+                document.querySelectorAll(".a-container li").forEach((li) => {
+                    li.classList.remove("correct", "wrong", "disabled");
+                });
+                setCurrentQuestion(currentQuestion + 1);
+            } else {
+                alert("Please answer the current question before proceeding.");
+            }
         }
     };
 
     const handleBack = () => {
         if (currentQuestion > 0) {
-            setCurrentQuestion((prev) => prev - 1);
+            document.querySelectorAll(".a-container li").forEach((li) => {
+                li.classList.remove("correct", "wrong", "disabled");
+            });
+            setCurrentQuestion(currentQuestion - 1);
         }
     };
 
@@ -79,7 +96,7 @@ export default function QuizSm() {
             localStorage.setItem("quizCompleted", "true");
             localStorage.setItem("quizScore", score.toString());
 
-            router.push(`/dashboard/sm/quizCenter/quiz/${quizLink}/results`);
+            router.replace(`/dashboard/sm/quizCenter/quiz/${quizLink}/results`);
         } else {
             alert("Please answer the current question before submitting.");
         }
@@ -87,23 +104,23 @@ export default function QuizSm() {
 
     const handleTimeUp = () => {
         let currentScore = 0;
-
         quizData.forEach((quizEl, index) => {
-            if (usersAnswers[index] === quizEl.ans) currentScore++;
+            if (usersAnswers[index] === quizEl.ans) {
+                currentScore++;
+            }
         });
 
         setScore(currentScore);
         setIsSubmitted(true);
         localStorage.setItem("quizCompleted", "true");
-        localStorage.setItem("quizScore", currentScore.toString());
-
-        router.push(`/dashboard/sm/quizCenter/quiz/${quizLink}/results`);
+        localStorage.setItem("quizScore", currentScore);
+        router.replace(`/dashboard/quizCenter/quiz/${quizLink}/results`); // ✅ Updated navigation
     };
 
-    const handleTimeElapsed = (time) => {
-        setTimeTaken(time);
-        localStorage.setItem("time-taken", time.toString());
-    };
+   const handleTimeElapsed = (time) => {
+       setTimeTaken(time);
+       localStorage.setItem("time-taken", time);
+   };
 
     return (
         <div className="quiz flex -mt-[0.28rem] pl-[1.25rem] lg:pl-[2.25rem] md:pl-[2.25rem] sm:pl-[2.25rem] pr-4 lg:pr-8 md:pr-8 sm:pr-4 mb-7">
