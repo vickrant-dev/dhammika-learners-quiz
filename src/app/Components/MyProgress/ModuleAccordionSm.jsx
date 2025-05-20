@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { CheckCircle, CheckCircle2, ChevronDown, Circle, CircleCheck, Clock4 } from "lucide-react";
 import { supabase } from "@/app/utils/supabase";
+import { useRouter } from "next/navigation";
 
 export default function Accordion() {
+
+    const router = useRouter(); // ✅
 
     const [lessonsData, setLessonsData] = useState([]);
     const [assiData, setAssiData] = useState([]);
@@ -73,51 +76,65 @@ export default function Accordion() {
             }));
             return;
         }
+        
         console.log("assi data:", assignments);
         setAssiData(assignments);
-        setLoading((prev) => ({
-            ...prev,
-            progressLoading: false
-        }));
-        
-        assignments.map((assi) => {
-            fetchModules(assi.module_id)
-        });
 
-        fetchLessons(stdID);
-
-    }
-
-    const fetchModules = async (assiID) => {
-
-        setLoading((prev) => ({
-            ...prev,
-            lessonsLoading: true
-        }));
-
-        console.log("Assi id:", assiID);
+        const moduleIds = [
+            ...new Set(assignments.map((assi) => assi.module_id)),
+        ];
 
         const { data: modules, error: modulesErr } = await supabase
             .from("modules")
             .select("*")
-            .eq("id", assiID);
+            .in("id", moduleIds);
 
         if (modulesErr) {
-            console.log("Error fetching modules data:", modulesErr?.message);
-            setLoading((prev) => ({
-                ...prev,
-                lessonsLoading: false
-            }));
-            return;
+            console.log("Error fetching modules data:", modulesErr.message);
+        } else {
+            console.log("Modules data:", modules);
+            setModulesData(modules);
         }
-        console.log("modules data:", modules);
-        setModulesData(modules);
+
+        await fetchLessons(stdID);
+
         setLoading((prev) => ({
             ...prev,
-            lessonsLoading: false
-        }))
+            progressLoading: false,
+        }));
 
     }
+
+    // const fetchModules = async (assiID) => {
+
+    //     setLoading((prev) => ({
+    //         ...prev,
+    //         lessonsLoading: true
+    //     }));
+
+    //     console.log("Assi id:", assiID);
+
+    //     const { data: modules, error: modulesErr } = await supabase
+    //         .from("modules")
+    //         .select("*")
+    //         .eq("id", assiID);
+
+    //     if (modulesErr) {
+    //         console.log("Error fetching modules data:", modulesErr?.message);
+    //         setLoading((prev) => ({
+    //             ...prev,
+    //             lessonsLoading: false
+    //         }));
+    //         return;
+    //     }
+    //     console.log("modules data:", modules);
+    //     setModulesData(modules);
+    //     setLoading((prev) => ({
+    //         ...prev,
+    //         lessonsLoading: false
+    //     }))
+
+    // }
 
      const fetchLessons = async (stdID) => {
     

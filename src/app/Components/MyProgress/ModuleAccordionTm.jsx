@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import { CheckCircle, CheckCircle2, ChevronDown, Circle, CircleCheck, Clock4 } from "lucide-react";
 import { supabase } from "@/app/utils/supabase";
+import { useRouter } from "next/navigation";
 
 export default function AccordionTm() {
+
+    const router = useRouter();
 
     const [lessonsData, setLessonsData] = useState([]);
     const [assiData, setAssiData] = useState([]);
@@ -75,49 +78,62 @@ export default function AccordionTm() {
         }
         console.log("assi data:", assignments);
         setAssiData(assignments);
-        setLoading((prev) => ({
-            ...prev,
-            progressLoading: false
-        }));
-        
-        assignments.map((assi) => {
-            fetchModules(assi.module_id)
-        });
 
-        fetchLessons(stdID);
-
-    }
-
-    const fetchModules = async (moduleID) => {
-
-        setLoading((prev) => ({
-            ...prev,
-            lessonsLoading: true
-        }));
-
-        console.log("Assi id:", moduleID);
+        const moduleIds = [
+            ...new Set(assignments.map((assi) => assi.module_id)),
+        ];
 
         const { data: modules, error: modulesErr } = await supabase
             .from("modules")
             .select("*")
-            .eq("id", moduleID);
+            .in("id", moduleIds);
 
         if (modulesErr) {
-            console.log("Error fetching modules data:", modulesErr?.message);
-            setLoading((prev) => ({
-                ...prev,
-                lessonsLoading: false
-            }));
-            return;
+            console.log("Error fetching modules data:", modulesErr.message);
+        } else {
+            console.log("Modules data:", modules);
+            setModulesData(modules);
         }
-        console.log("modules data:", modules);
-        setModulesData(modules);
+
+        await fetchLessons(stdID);
+
         setLoading((prev) => ({
             ...prev,
-            lessonsLoading: false
+            progressLoading: false,
         }));
 
     }
+
+    // const fetchModules = async (moduleID) => {
+
+    //     setLoading((prev) => ({
+    //         ...prev,
+    //         lessonsLoading: true
+    //     }));
+
+    //     console.log("Assi id:", moduleID);
+
+    //     const { data: modules, error: modulesErr } = await supabase
+    //         .from("modules")
+    //         .select("*")
+    //         .eq("id", moduleID);
+
+    //     if (modulesErr) {
+    //         console.log("Error fetching modules data:", modulesErr?.message);
+    //         setLoading((prev) => ({
+    //             ...prev,
+    //             lessonsLoading: false
+    //         }));
+    //         return;
+    //     }
+    //     console.log("modules data:", modules);
+    //     setModulesData(modules);
+    //     setLoading((prev) => ({
+    //         ...prev,
+    //         lessonsLoading: false
+    //     }));
+
+    // }
 
     const fetchLessons = async (stdID) => {
 

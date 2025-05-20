@@ -27,6 +27,10 @@ export default function Accordion() {
             if (userError || !currentUser) {
                 console.log("Error getting user:", userError?.message);
                 router.push('/student/login');
+                setLoading((prev) => ({
+                    ...prev,
+                    progressLoading: false
+                }));
                 return;
             }
 
