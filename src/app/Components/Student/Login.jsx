@@ -82,6 +82,11 @@ export default function LoginPage() {
                             {loading ? "Sending..." : "Send OTP"}
                         </button>
                     </form>
+                     <div className="mt-5 login-option">
+                        <Link href="/student/login-password">
+                            <p className="font-sm flex items-center justify-center underline underline-offset-2 text-sm">Login with Password</p>
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>
