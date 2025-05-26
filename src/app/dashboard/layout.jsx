@@ -1,6 +1,5 @@
 "use client"
 
-import DashboardSidebar from "@/app/Components/Sidebar"
 import { useEffect, useState } from "react"
 
 export default function DashboardLayout({ children }) {
@@ -23,7 +22,6 @@ export default function DashboardLayout({ children }) {
 
   return (
     <div className="flex h-100 bg-base-200">
-      {/* <DashboardSidebar /> */}
       <main className={`bg-white flex-1 transition-all duration-300 ${isMobile ? "pt-[1.25rem] pl-[3.25rem]" : "pl-[0] pt-10"}`}>
         {children}
       </main>
