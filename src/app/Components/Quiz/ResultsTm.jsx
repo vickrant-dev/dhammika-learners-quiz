@@ -13,30 +13,47 @@ import {
     ChevronRight,
     Clock,
 } from "lucide-react";
+import { quizDatatm as quiz1Datatm } from '../../utils/tamil/quizDatatm';
+import { quiz2Datatm } from '../../utils/tamil/quiz2Datatm';
+import { quiz3Datatm } from '../../utils/tamil/quiz3Datatm';
+import { quiz4Datatm } from '../../utils/tamil/quiz4Datatm';
+import Image from "next/image";
 
 export default function ResultsTm() {
     const router = useRouter();
     const { quizLink } = useParams();
     const [quizNumber, setQuizNumber] = useState(Number(quizLink));
 
-    const fetchUser = async () => {
-        const {
-            data: { user: currentUser },
-            error: userError,
-        } = await supabase.auth.getUser();
+    // const fetchUser = async () => {
+    //     const {
+    //         data: { user: currentUser },
+    //         error: userError,
+    //     } = await supabase.auth.getUser();
 
-        if (userError || !currentUser) {
-            console.log("Error getting user:", userError?.message);
-            router.push("/student/login");
-            return;
-        }
+    //     if (userError || !currentUser) {
+    //         console.log("Error getting user:", userError?.message);
+    //         router.push("/student/login");
+    //         return;
+    //     }
 
-        console.log("uid:", currentUser?.id);
+    //     console.log("uid:", currentUser?.id);
+    // };
+
+    // useEffect(() => {
+    //     fetchUser();
+    // }, []);
+
+    const quizDataMap = {
+        1: quiz1Datatm,
+        2: quiz2Datatm,
+        3: quiz3Datatm,
+        4: quiz4Datatm,
     };
 
-    useEffect(() => {
-        fetchUser();
-    }, []);
+    const quizData = quizDataMap[Number(quizLink)] || quiz1Datatm;
+
+    const wrongAnswers = localStorage.getItem("WrongAnswers");
+    const wrongAnswersObj = JSON.parse(wrongAnswers);
 
     const restartQuiz = () => {
         router.replace(`/dashboard/tm/quizCenter/quiz/${quizLink}`);
@@ -84,7 +101,7 @@ export default function ResultsTm() {
 
     return (
         <>
-            <div className="flex -mt-[0.28rem] pl-[1.25rem] lg:pl-[2.25rem] md:pl-[2.25rem] sm:pl-[2.25rem] pr-4 lg:pr-8 md:pr-8 sm:pr-4 ">
+            <div className="flex -mt-[0.28rem] pl-[2.25rem] pr-4 lg:pr-8 md:pr-8 sm:pr-4 ">
                 <div className="w-full border border-base-300 rounded-2xl shadow-lg/4 p-6 sm:p-8 space-y-6 sm:space-y-8 bg-base-100">
                     {/* Header */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -155,7 +172,9 @@ export default function ResultsTm() {
                                 முந்தைய வினாடிவினா
                             </button>
                         ) : (
-                            <div className={`${quizNumber > 1 ? "flex" :"hidden"}`}></div>
+                            <div
+                                className={`${quizNumber > 1 ? "flex" : "hidden"}`}
+                            ></div>
                         )}
 
                         <button
@@ -180,6 +199,45 @@ export default function ResultsTm() {
                         )}
                     </div>
                 </div>
+            </div>
+            <div className="qa-container mt-10 pl-[2.25rem] pb-1 pr-8">
+                <div className="heading mb-10">
+                    <p className="text-xl font-semibold">
+                        நீங்கள் தவறாகப் புரிந்து கொண்ட கேள்விகள்
+                    </p>
+                </div>
+                {/* Question + Image */}
+                {Object.entries(wrongAnswersObj).map(([key, value]) => (
+                    <div key={key + value} className="mb-20">
+                        <div className="img-container flex flex-col sm:flex-row gap-5 items-start">
+                            {quizData[key].src && (
+                                <Image
+                                    src={quizData[key].src}
+                                    width={130}
+                                    alt="quizImage"
+                                    className="rounded-md"
+                                />
+                            )}
+                            <div className="q-container text-base sm:text-lg font-medium">
+                                <p>
+                                    {+key + 1}. {quizData[key].question}
+                                    {/* + --> shorthand for taking it as a number */}
+                                </p>
+                            </div>
+                        </div>
+                        {/* Answers */}
+                        <div className="a-container mt-6 sm:mt-8 flex flex-col gap-4">
+                            {quizData[key].answers.map((answer, index) => (
+                                <li
+                                    className={`list-none transition-all duration-150 ease-in-out border border-primary/20 p-4 rounded-lg select-none text-sm sm:text-base ${answer.correct ? "bg-green-500 text-base-100" : "bg-none"} ${index === value ? "bg-red-500 text-base-100" : "bg-none"}`}
+                                    key={index}
+                                >
+                                    {answer.text}
+                                </li>
+                            ))}
+                        </div>
+                    </div>
+                ))}
             </div>
         </>
     );

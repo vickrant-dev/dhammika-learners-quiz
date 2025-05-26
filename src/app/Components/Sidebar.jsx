@@ -90,16 +90,6 @@ export default function Sidebar() {
 
     const menuItems = [
         {
-            icon: <Home size={24} />,
-            label: "Dashboard",
-            link: currentPrefix,
-        },
-        {
-            icon: <GraduationCap size={24} />,
-            label: "My Progress",
-            link: `${currentPrefix}/my-progress`,
-        },
-        {
             icon: <Lightbulb size={24} />,
             label: "Quiz Center",
             link: `${currentPrefix}/quizCenter`,
@@ -142,43 +132,43 @@ export default function Sidebar() {
         setIsSidebarOpen(!isSidebarOpen);
     };
 
-    const fetchUser = async () => {
-        const {
-            data: { user },
-        } = await supabase.auth.getUser();
+    // const fetchUser = async () => {
+    //     const {
+    //         data: { user },
+    //     } = await supabase.auth.getUser();
 
-        // Retrieve student_id_inherited from reg users
-        const { data: stdReg, error: stdRegErr } = await supabase
-            .from("registered_users")
-            .select("student_id_inherited")
-            .eq("auth_student_id", user.id)
+    //     // Retrieve student_id_inherited from reg users
+    //     const { data: stdReg, error: stdRegErr } = await supabase
+    //         .from("registered_users")
+    //         .select("student_id_inherited")
+    //         .eq("auth_student_id", user.id)
 
-        if (stdRegErr) {
-            console.log("Error getting student data: ", stdRegErr.message);
-            return;
-        }
+    //     if (stdRegErr) {
+    //         console.log("Error getting student data: ", stdRegErr.message);
+    //         return;
+    //     }
 
-        const { data: stdData, error:stdDataErr } = await supabase
-            .from("students")
-            .select("*")
-            .eq("id", stdReg[0].student_id_inherited)
+    //     const { data: stdData, error:stdDataErr } = await supabase
+    //         .from("students")
+    //         .select("*")
+    //         .eq("id", stdReg[0].student_id_inherited)
 
-        if(stdDataErr) {
-            console.log("Error getting std data:", stdDataErr.message);
-            return;
-        }
-        console.log("std darta:", stdData);
-        setStudentData((prev) => ({
-            ...prev,
-            full_name: stdData[0].full_name,
-            role: stdData[0].role
-        }));
+    //     if(stdDataErr) {
+    //         console.log("Error getting std data:", stdDataErr.message);
+    //         return;
+    //     }
+    //     console.log("std darta:", stdData);
+    //     setStudentData((prev) => ({
+    //         ...prev,
+    //         full_name: stdData[0].full_name,
+    //         role: stdData[0].role
+    //     }));
 
-    };
+    // };
 
-    useEffect(() => {
-        fetchUser();
-    }, []);
+    // useEffect(() => {
+    //     fetchUser();
+    // }, []);
 
     return (
         <>
@@ -271,43 +261,6 @@ export default function Sidebar() {
                         ))}
                     </ul>
                 </div>
-
-                {/* Signout */}
-                <ul className="mt-5 dropdown dropdown-top student-user flex items-center relative">
-                    <div
-                        className="flex items-center gap-3 border border-primary/0 hover:border-primary/20 hover:bg-primary-content transition duration-300 ease-in-out hover:text-primary p-3.25 rounded-2xl cursor-pointer w-full"
-                        tabIndex={0}
-                        role="button"
-                    >
-                        <div className="avatar placeholder">
-                            <div className="bg-neutral-focus text-neutral-content w-12 h-12 rounded-full bg-primary flex items-center justify-center">
-                                <span className="text-lg flex items-center justify-center mt-2.5 text-base-300 font-medium">
-                                    {studentData?.full_name.slice(0, 1)}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <p className="text-md font-semibold">
-                                {studentData?.full_name}
-                            </p>
-                            <span className="text-sm text-gray-500">
-                                {studentData?.role}
-                            </span>
-                        </div>
-                    </div>
-
-                    <ul
-                        tabIndex={0}
-                        className="dropdown-content menu bg-base-100 rounded-xl z-10 w-52 p-2 shadow-md border border-base-300"
-                    >
-                        <li onClick={logoutDashboard}>
-                            <a className="rounded-lg hover:bg-red-500 hover:text-white">
-                                <LogOut size={17} className="mr-2" /> Logout
-                            </a>
-                        </li>
-                    </ul>
-                </ul>
             </div>
 
             {/* Overlay for mobile */}

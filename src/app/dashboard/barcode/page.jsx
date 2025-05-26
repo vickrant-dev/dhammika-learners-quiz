@@ -2,9 +2,9 @@
 
 import dynamic from 'next/dynamic';
 
-const Login = dynamic(() => import('@/app/Components/Auth/Login'), {
+const BarcodeLogin = dynamic(() => import('@/app/Components/BarcodeLogin/BarcodeLogin'), {
   ssr: false, // Optional, disables server-side rendering for this component
   loading: () => <p className='flex items-center justify-center text-lg font-medium h-[100vh]'>Loading...</p>, // Optional loading indicator
 });
 
-export default Login
+export default BarcodeLogin

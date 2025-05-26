@@ -12,101 +12,101 @@ export default function Dashboard() {
     });
     const router = useRouter(); // Define the router
 
-    useEffect(() => {
-        const fetchUser = async () => {
-            setLoading((prev) => ({
-                ...prev,
-                progressLoading: true,
-            }));
+    // useEffect(() => {
+    //     const fetchUser = async () => {
+    //         setLoading((prev) => ({
+    //             ...prev,
+    //             progressLoading: true,
+    //         }));
 
-            const {
-                data: { user: currentUser },
-                error: userError,
-            } = await supabase.auth.getUser();
+    //         const {
+    //             data: { user: currentUser },
+    //             error: userError,
+    //         } = await supabase.auth.getUser();
 
-            if (userError || !currentUser) {
-                console.log("Error getting user:", userError?.message);
-                router.push("/student/login");
-                setLoading((prev) => ({
-                    ...prev,
-                    progressLoading: false,
-                }));
-                return;
-            }
+    //         if (userError || !currentUser) {
+    //             console.log("Error getting user:", userError?.message);
+    //             router.push("/student/login");
+    //             setLoading((prev) => ({
+    //                 ...prev,
+    //                 progressLoading: false,
+    //             }));
+    //             return;
+    //         }
 
-            const uid = currentUser?.id;
-            console.log("uid:", uid);
-            console.log("Authenticated user:", currentUser);
+    //         const uid = currentUser?.id;
+    //         console.log("uid:", uid);
+    //         console.log("Authenticated user:", currentUser);
 
-            // Fetch student id based on currentUser.id
-            const { data: studentID, error: studentIDError } = await supabase
-                .from("registered_users")
-                .select("student_id_inherited")
-                .eq("auth_student_id", currentUser.id);
+    //         // Fetch student id based on currentUser.id
+    //         const { data: studentID, error: studentIDError } = await supabase
+    //             .from("registered_users")
+    //             .select("student_id_inherited")
+    //             .eq("auth_student_id", currentUser.id);
 
-            if (studentIDError) {
-                console.log("Error fetching studentID Data");
-                router.push("/student/login");
-                setLoading((prev) => ({
-                    ...prev,
-                    progressLoading: false,
-                }));
-                return;
-            } else {
-                console.log("Student ID:", studentID[0].student_id_inherited);
-            }
+    //         if (studentIDError) {
+    //             console.log("Error fetching studentID Data");
+    //             router.push("/student/login");
+    //             setLoading((prev) => ({
+    //                 ...prev,
+    //                 progressLoading: false,
+    //             }));
+    //             return;
+    //         } else {
+    //             console.log("Student ID:", studentID[0].student_id_inherited);
+    //         }
 
-            fetchAssi(studentID[0].student_id_inherited);
-        };
+    //         fetchAssi(studentID[0].student_id_inherited);
+    //     };
 
-        const fetchAssi = async (stdID) => {
-            const { data: assignments, error: assignErr } = await supabase
-                .from("student_module_assignments")
-                .select("*")
-                .eq("student_id", stdID);
+    //     const fetchAssi = async (stdID) => {
+    //         const { data: assignments, error: assignErr } = await supabase
+    //             .from("student_module_assignments")
+    //             .select("*")
+    //             .eq("student_id", stdID);
 
-            if (assignErr) {
-                console.log(
-                    "Error fetching assignments data:",
-                    assignErr?.message
-                );
-                setLoading((prev) => ({
-                    ...prev,
-                    progressLoading: false,
-                }));
-                return;
-            }
+    //         if (assignErr) {
+    //             console.log(
+    //                 "Error fetching assignments data:",
+    //                 assignErr?.message
+    //             );
+    //             setLoading((prev) => ({
+    //                 ...prev,
+    //                 progressLoading: false,
+    //             }));
+    //             return;
+    //         }
 
-            console.log("Assignments data:", assignments);
-            setAssiData(assignments);
-            setLoading((prev) => ({
-                ...prev,
-                progressLoading: false,
-            }));
+    //         console.log("Assignments data:", assignments);
+    //         setAssiData(assignments);
+    //         setLoading((prev) => ({
+    //             ...prev,
+    //             progressLoading: false,
+    //         }));
             
-            fetchLessons(stdID);
-        };
+    //         fetchLessons(stdID);
+    //     };
 
-        const fetchLessons = async (stdID) => {
+    //     const fetchLessons = async (stdID) => {
 
-            const { data:lessonsDataDB, error:lessonsErr } = await supabase
-                .from("lessons")
-                .select("*")
-                .eq("student_id", stdID);
+    //         const { data:lessonsDataDB, error:lessonsErr } = await supabase
+    //             .from("lessons")
+    //             .select("*")
+    //             .eq("student_id", stdID);
 
-            if (lessonsErr) {
-                console.log('Error fetching lessson');
-                router.push("/student/login");
-                return;
-            }
+    //         if (lessonsErr) {
+    //             console.log('Error fetching lessson');
+    //             router.push("/student/login");
+    //             return;
+    //         }
 
-            setLessonsData(lessonsDataDB);
-            console.log('lessons data:', lessonsDataDB);
+    //         setLessonsData(lessonsDataDB);
+    //         console.log('lessons data:', lessonsDataDB);
 
-        }
+    //     }
 
-        fetchUser();
-    }, []);
+    //     fetchUser();
+    // }, []);
 
     return (
         <>
