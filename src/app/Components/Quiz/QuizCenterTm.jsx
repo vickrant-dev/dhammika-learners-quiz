@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { quizPapertm as quizPaper } from '../../utils/tamil/quizChoicetm';
 import { Timer, NotebookPen, ChevronRight, ArrowLeft } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
-import { supabase } from "@/app/utils/supabase";
 
 export default function QuizCenterTm() {
 

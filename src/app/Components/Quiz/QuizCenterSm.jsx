@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { quizPapersm as quizPaper } from '../../utils/sinhala/quizChoicesm';
 import { Timer, NotebookPen, ChevronRight, ArrowLeft } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
-import { supabase } from "@/app/utils/supabase";
 
 export default function QuizCenterSm() {
 

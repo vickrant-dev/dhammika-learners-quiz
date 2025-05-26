@@ -1,7 +1,6 @@
 'use client'
 import { useState } from "react";
 import { useEffect } from "react";
-import { supabase } from "@/app/utils/supabase";
 import { useParams, useRouter } from "next/navigation";
 import { quizData } from "../../utils/quizData";
 import { quizData as quiz1Data } from '../../utils/quizData'

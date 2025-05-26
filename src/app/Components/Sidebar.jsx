@@ -4,7 +4,6 @@ import { Home, GraduationCap, Lightbulb, Menu, X, LogOut } from "lucide-react";
 import logo from "../assets/logo.png";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { supabase } from "../utils/supabase";
 import { useEffect, useState } from "react";
 
 export default function Sidebar() {
@@ -114,16 +113,6 @@ export default function Sidebar() {
             );
         } else {
             return pathname === prefix || pathname.startsWith(`${prefix}/`);
-        }
-    };
-
-    const logoutDashboard = async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) {
-            console.error("Error signing out:", error.message);
-            return;
-        } else {
-            router.push("/student/login");
         }
     };
 

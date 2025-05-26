@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { quizData } from "../../utils/quizData"; // Adjust if needed
 import { quizPaper } from "../../utils/quizChoice";
-import { supabase } from "@/app/utils/supabase";
 import {
     Award,
     RotateCcw,

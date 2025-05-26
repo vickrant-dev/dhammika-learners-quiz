@@ -7,7 +7,6 @@ import { quiz4Data } from '../../utils/quiz4Data'
 import Timer from './Timer'
 import { useParams, useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { supabase } from "@/app/utils/supabase";
 import './QuizStyles.css';
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 

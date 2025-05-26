@@ -6,7 +6,6 @@ import { quiz2Datatm } from '../../utils/tamil/quiz2Datatm';
 import { quiz3Datatm } from '../../utils/tamil/quiz3Datatm';
 import { quiz4Datatm } from '../../utils/tamil/quiz4Datatm';
 import Timer from './Timer';
-import { supabase } from "@/app/utils/supabase";
 import './QuizStyles.css';
 import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';

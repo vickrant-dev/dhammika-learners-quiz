@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { quizPaper } from '../../utils/quizChoice';
 import { Timer, NotebookPen, ChevronRight, ArrowLeft } from 'lucide-react';
-import { supabase } from "@/app/utils/supabase";
 
 export default function QuizCenter() {
 

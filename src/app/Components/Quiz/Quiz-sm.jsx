@@ -7,7 +7,6 @@ import { quiz3Datasm } from "../../utils/sinhala/quiz3Datasm";
 import { quiz4Datasm } from "../../utils/sinhala/quiz4Datasm";
 import Timer from "./Timer";
 import { useRouter, useParams } from "next/navigation";
-import { supabase } from "@/app/utils/supabase";
 import "./QuizStyles.css";
 import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
