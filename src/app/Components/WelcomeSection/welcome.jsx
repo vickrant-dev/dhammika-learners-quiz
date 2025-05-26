@@ -8,7 +8,7 @@ export default function WelcomePage() {
     const router = useRouter();
 
     const handleClick = () => {
-        router.push("/dashboard/language");
+        router.push("/dashboard/barcode");
     };
 
     return (
