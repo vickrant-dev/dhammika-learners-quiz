@@ -103,7 +103,7 @@ export default function QuizSm() {
         localStorage.setItem("quizCompleted", "true");
         localStorage.setItem("quizScore", score);
         localStorage.setItem("WrongAnswers", JSON.stringify(wrongAnswers));
-        router.replace(`/dashboard/quizCenter/quiz/${quizLink}/results`);
+        router.replace(`/dashboard/sm/quizCenter/quiz/${quizLink}/results`);
     };
 
     const handleTimeUp = () => {
