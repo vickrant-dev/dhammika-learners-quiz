@@ -73,15 +73,11 @@ export default function QuizSm() {
     };
 
     const handleNext = () => {
-        if (currentQuestion !== quizData.length - 1) {
-            if (usersAnswers[currentQuestion] !== undefined) {
-                document.querySelectorAll(".a-container li").forEach((li) => {
-                    li.classList.remove("correct", "wrong", "disabled");
-                });
-                setCurrentQuestion(currentQuestion + 1);
-            } else {
-                alert("Please answer the current question before proceeding.");
-            }
+        document.querySelectorAll(".a-container li").forEach((li) => {
+            li.classList.remove("correct", "wrong", "disabled");
+        });
+        if (currentQuestion < quizData.length - 1) {
+            setCurrentQuestion(currentQuestion + 1);
         }
     };
 
@@ -95,15 +91,19 @@ export default function QuizSm() {
     };
 
     const handleSubmit = () => {
-        if (usersAnswers[currentQuestion] !== undefined) {
-            setIsSubmitted(true);
-            localStorage.setItem("quizCompleted", "true");
-            localStorage.setItem("quizScore", score.toString());
-            localStorage.setItem("WrongAnswers", JSON.stringify(wrongAnswers));
-            router.replace(`/dashboard/sm/quizCenter/quiz/${quizLink}/results`);
-        } else {
-            alert("Please answer the current question before submitting.");
+        const totalQuestions = quizData.length;
+        const answeredQuestions = Object.keys(usersAnswers).length;
+
+        if (answeredQuestions < totalQuestions) {
+            alert("Please answer all questions before submitting the quiz.");
+            return;
         }
+
+        setIsSubmitted(true);
+        localStorage.setItem("quizCompleted", "true");
+        localStorage.setItem("quizScore", score);
+        localStorage.setItem("WrongAnswers", JSON.stringify(wrongAnswers));
+        router.replace(`/dashboard/quizCenter/quiz/${quizLink}/results`);
     };
 
     const handleTimeUp = () => {
@@ -220,14 +220,34 @@ export default function QuizSm() {
                         </h2>
                     </div>
                     <div className="grid grid-cols-6 gap-4 mt-7">
-                        {quizData.map((_, i) => (
-                            <div
-                                key={i}
-                                className={`w-6.5 h-6.5 text-sm flex items-center justify-center rounded-lg border border-base-content ${counter >= i + 1 ? "bg-blue-500 text-base-100" : "bg-none"}`}
-                            >
-                                {i + 1}
-                            </div>
-                        ))}
+                        {quizData.map((_, i) => {
+                            const isAnswered = usersAnswers[i] !== undefined;
+                            const bgColor = isAnswered
+                                ? "bg-blue-500 text-base-100"
+                                : "bg-gray-300 text-gray-800";
+
+                            return (
+                                <div
+                                    key={i}
+                                    onClick={() => {
+                                        document
+                                            .querySelectorAll(".a-container li")
+                                            .forEach((li) =>
+                                                li.classList.remove(
+                                                    "correct",
+                                                    "wrong",
+                                                    "disabled"
+                                                )
+                                            );
+                                        setCurrentQuestion(i);
+                                    }}
+                                    className={`cursor-pointer w-6.5 h-6.5 text-sm flex items-center justify-center rounded-lg border border-base-content ${bgColor} hover:brightness-90 transition`}
+                                    title={`Go to question ${i + 1}`}
+                                >
+                                    {i + 1}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>

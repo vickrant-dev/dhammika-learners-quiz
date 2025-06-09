@@ -69,10 +69,7 @@ export default function QuizCenter() {
                             key={quizIndex}
                         >
                             <div className="quiz-card-content mb-5">
-                                <div className="quiz-card-badge bg-primary w-fit py-1 px-2.5 rounded-md text-base-100 text-md font-semibold">
-                                    {`Quiz ${quizIndex + 1}`}
-                                </div>
-                                <h3 className="quiz-card-title my-3 text-xl">
+                                <h3 className="quiz-card-title mb-3 text-xl">
                                     {quiz.title}
                                 </h3>
                                 <p className="quiz-card-description text-neutral-500 mb-5 text-sm">

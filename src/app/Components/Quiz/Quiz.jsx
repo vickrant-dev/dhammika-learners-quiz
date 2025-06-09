@@ -84,17 +84,13 @@ export default function Quiz() {
     }
 
     const handleNext = () => {
-        if (currentQuestion !== quizData.length - 1) {
-            if (usersAnswers[currentQuestion] !== undefined) {
-                document.querySelectorAll(".a-container li").forEach(li => {
-                    li.classList.remove("correct", "wrong", "disabled");
-                })
-                setCurrentQuestion(currentQuestion + 1);
-            } else {
-                alert("Please answer the current question before proceeding.")
-            }
+        document.querySelectorAll(".a-container li").forEach((li) => {
+            li.classList.remove("correct", "wrong", "disabled");
+        });
+        if (currentQuestion < quizData.length - 1) {
+            setCurrentQuestion(currentQuestion + 1);
         }
-    }
+    };
 
     const handleBack = () => {
         if (currentQuestion > 0) {
@@ -106,16 +102,20 @@ export default function Quiz() {
     }
 
     const handleSubmit = () => {
-        if (usersAnswers[currentQuestion] !== undefined) {
-            setIsSubmitted(true);
-            localStorage.setItem("quizCompleted", "true");
-            localStorage.setItem("quizScore", score);
-            localStorage.setItem("WrongAnswers", JSON.stringify(wrongAnswers));
-            router.replace(`/dashboard/quizCenter/quiz/${quizLink}/results`); // ✅ Updated navigation
-        } else {
-            alert("Please answer the current question before proceeding.");
+        const totalQuestions = quizData.length;
+        const answeredQuestions = Object.keys(usersAnswers).length;
+
+        if (answeredQuestions < totalQuestions) {
+            alert("Please answer all questions before submitting the quiz.");
+            return;
         }
-    }
+
+        setIsSubmitted(true);
+        localStorage.setItem("quizCompleted", "true");
+        localStorage.setItem("quizScore", score);
+        localStorage.setItem("WrongAnswers", JSON.stringify(wrongAnswers));
+        router.replace(`/dashboard/quizCenter/quiz/${quizLink}/results`);
+    };
 
     const handleTimeUp = () => {
         let currentScore = 0;
@@ -168,7 +168,9 @@ export default function Quiz() {
                 <div className="quiz-container w-full bg-primary-content/18 rounded-xl overflow-hidden border border-base-300 shadow-lg/6 backdrop-blur-sm bg-opacity-90">
                     {/* Header */}
                     <div className="heading p-4 sm:p-6 border-b border-neutral/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                        <h2 className="text-xl sm:text-2xl font-semibold">Quiz</h2>
+                        <h2 className="text-xl sm:text-2xl font-semibold">
+                            Quiz
+                        </h2>
                         <Timer
                             onTimeUp={handleTimeUp}
                             isSubmitted={isSubmitted}
@@ -225,9 +227,7 @@ export default function Quiz() {
                             <button
                                 onClick={handleBack}
                                 className={`w-full sm:w-[100px] rounded-md ${
-                                    currentQuestion > 0
-                                        ? "flex"
-                                        : "hidden"
+                                    currentQuestion > 0 ? "flex" : "hidden"
                                 } border border-primary/50 btn btn-primary bg-primary-content/50 text-primary`}
                             >
                                 Back
@@ -249,17 +249,39 @@ export default function Quiz() {
                 </div>
                 <div className="qa-table bg-primary-content/18 rounded-xl overflow-hidden border border-base-300 shadow-lg/6 backdrop-blur-sm bg-opacity-90 p-5">
                     <div className="heading border-b border-neutral/10 pt-1.25 pb-7 gap-2">
-                        <h2 className="text-lg font-semibold">Your Quiz Progress</h2>
+                        <h2 className="text-lg font-semibold">
+                            Your Quiz Progress
+                        </h2>
                     </div>
                     <div className="grid grid-cols-6 gap-4 mt-7">
-                        {quizData.map((_, i) => (
-                            <div
-                                key={i}
-                                className={`w-6.5 h-6.5 text-sm flex items-center justify-center rounded-lg border border-base-content ${counter >= i + 1 ? "bg-blue-500 text-base-100" : "bg-none"}`}
-                            >
-                                {i + 1}
-                            </div>
-                        ))}
+                        {quizData.map((_, i) => {
+                            const isAnswered = usersAnswers[i] !== undefined;
+                            const bgColor = isAnswered
+                                ? "bg-blue-500 text-base-100"
+                                : "bg-gray-300 text-gray-800";
+
+                            return (
+                                <div
+                                    key={i}
+                                    onClick={() => {
+                                        document
+                                            .querySelectorAll(".a-container li")
+                                            .forEach((li) =>
+                                                li.classList.remove(
+                                                    "correct",
+                                                    "wrong",
+                                                    "disabled"
+                                                )
+                                            );
+                                        setCurrentQuestion(i);
+                                    }}
+                                    className={`cursor-pointer w-6.5 h-6.5 text-sm flex items-center justify-center rounded-lg border border-base-content ${bgColor} hover:brightness-90 transition`}
+                                    title={`Go to question ${i + 1}`}
+                                >
+                                    {i + 1}
+                                </div>
+                            );
+                        })}
                     </div>
                 </div>
             </div>
