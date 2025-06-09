@@ -164,7 +164,7 @@ export default function Quiz() {
 
     return (
         <>
-            <div className="quiz flex -mt-[0.28rem] pl-[2.25rem] pr-4 lg:pr-8 md:pr-8 sm:pr-4 mb-7 gap-3">
+            <div className="quiz flex flex-col 2xl:flex-row xl:flex-row lg:flex-row md:flex-col sm:flex-col -mt-[0.28rem] pl-[2.25rem] pr-4 lg:pr-8 md:pr-8 sm:pr-4 mb-7 gap-3">
                 <div className="quiz-container w-full bg-primary-content/18 rounded-xl overflow-hidden border border-base-300 shadow-lg/6 backdrop-blur-sm bg-opacity-90">
                     {/* Header */}
                     <div className="heading p-4 sm:p-6 border-b border-neutral/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
