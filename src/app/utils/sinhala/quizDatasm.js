@@ -161,7 +161,7 @@ export const quizDatasm = [
         ]
     }, 
     {
-        "question": "question missing...",
+        "question": "මාර්ග සංඥාවෙන් දැක්වෙන්නේ",
         "src": quiz1Image14,
         "answers": [
             { "text": "ඉදිරියෙන් දකුණට හරවනු", "correct": false },
